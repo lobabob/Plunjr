@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!--<TextView-->
+        <!--android:id="@+id/review_name"-->
+        <!--android:text="test"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content" />-->
+
+    <RatingBar
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:stepSize="1.0"
+        android:rating="3"
+        android:numStars="5" />
+
+</LinearLayout>
