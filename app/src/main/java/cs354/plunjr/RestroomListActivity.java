@@ -5,11 +5,61 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
+import android.widget.RatingBar;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class RestroomListActivity extends AppCompatActivity {
+
+    private List<Map<String, String>> restroomList = new ArrayList<Map<String, String>>();
+
+    private void initRestroomList() {
+        try {
+            // TODO: get JSON object through http request instead
+            JSONObject res = new JSONObject(getResources().getString(R.string.debug_json));
+            JSONArray restrooms = res.optJSONArray("restrooms");
+
+            // Create a hash map for each row's data (one hash map per row)
+            for(int i = 0; i < restrooms.length(); i++) {
+                JSONObject restroom = restrooms.getJSONObject(i);
+                HashMap<String, String> rowData = new HashMap<>();
+
+                Iterator<String> keys = restroom.keys();
+                while(keys.hasNext()) {
+                    String key = keys.next();
+                    rowData.put(key, restroom.optString(key));
+                }
+                restroomList.add(rowData);
+            }
+        } catch(JSONException e) {
+            Toast.makeText(this, "JSON exception while populating list", Toast.LENGTH_SHORT);
+            Log.e("Restroom List", e.getMessage(), e);
+        }
+        String[] from = {"name", "address", "rating", "ratingCount"};
+        int[] to = {R.id.listRowTitle, R.id.listRowAddress, R.id.listRowRatingBar, R.id.listRowReviewCount};
+
+        // Bind data in each hash map to a corresponding row in the list view
+        ListView restroomListView = (ListView) findViewById(R.id.restroomList);
+        SimpleAdapter restroomListViewAdapter = new SimpleAdapter(this, restroomList, R.layout.restroom_list_row, from, to);
+        restroomListViewAdapter.setViewBinder(new RestroomListViewBinder());
+        restroomListView.setAdapter(restroomListViewAdapter);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +76,7 @@ public class RestroomListActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+        initRestroomList();
     }
 
     @Override
@@ -46,7 +97,27 @@ public class RestroomListActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
+    }
+
+    private class RestroomListViewBinder implements SimpleAdapter.ViewBinder {
+
+        @Override
+        public boolean setViewValue(View view, Object data, String textRepresentation) {
+            if(view.getId() == R.id.listRowRatingBar) {
+                RatingBar bar = (RatingBar) view;
+                bar.setRating(Float.parseFloat(textRepresentation));
+            } else if(view.getId() == R.id.listRowDistance) {
+                // TODO: calculate distance from user and bind value to view
+            } else {
+                TextView text = (TextView) view;
+
+                if(view.getId() == R.id.listRowReviewCount) {
+                    textRepresentation = String.format(getResources().getString(R.string.review_count_format), textRepresentation);
+                }
+                text.setText(textRepresentation);
+            }
+            return true;
+        }
     }
 }
