@@ -1,4 +1,24 @@
 <resources>
     <string name="app_name">Plunjr</string>
     <string name="action_settings">Settings</string>
+    <string name="review_count_format">Based on %s reviews</string>
+
+    <string name="debug_json">
+        "{
+            \"restrooms\": [
+                {
+                    \"name\":\"Our Apartment\",
+                    \"address\":\"2502 Leon Street\",
+                    \"rating\":\"4.1\",
+                    \"ratingCount\":\"5\"
+                },
+                {
+                    \"name\":\"Some Other Place\",
+                    \"address\":\"Anywhere but here\",
+                    \"rating\":\"3.5\",
+                    \"ratingCount\":\"27\"
+                }
+            ]
+        }"
+    </string>
 </resources>
