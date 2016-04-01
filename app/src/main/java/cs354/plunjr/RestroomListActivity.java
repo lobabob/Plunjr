@@ -1,5 +1,7 @@
 package cs354.plunjr;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -9,6 +11,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.SimpleAdapter;
@@ -61,22 +65,35 @@ public class RestroomListActivity extends AppCompatActivity {
         restroomListView.setAdapter(restroomListViewAdapter);
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_restroom_list);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    // TODO: choose either action bar or floating action button, not both
+    private void initReviewDialog() {
+        final WriteReviewDialogFragment dialog = new WriteReviewDialogFragment();
 
+        // Action bar button
+        ImageButton writeReviewButton = (ImageButton) findViewById(R.id.write_review_button);
+        writeReviewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.show(getFragmentManager(), "dialog");
+            }
+        });
+        // Floating Action Button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                dialog.show(getFragmentManager(), "dialog");
             }
         });
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_restroom_list);
+
         initRestroomList();
+        initReviewDialog();
     }
 
     @Override
