@@ -3,6 +3,15 @@
     <string name="action_settings">Settings</string>
     <string name="review_count_format">Based on %s reviews</string>
 
+    <!-- For "post review" dialog -->
+    <string name="dialog_title">Rate a Restroom</string>
+    <string name="dialog_address_hint">Restroom Address</string>
+    <string name="dialog_review_hint">Write a Review</string>
+    <string name="dialog_use_location_button">Use My Location</string>
+    <string name="dialog_submit">Post Review</string>
+    <string name="dialog_cancel">Cancel</string>
+
+    <!-- TODO: Remove when not needed -->
     <string name="debug_json">
         "{
             \"restrooms\": [
