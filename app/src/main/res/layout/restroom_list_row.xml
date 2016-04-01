@@ -50,6 +50,8 @@
         android:layout_toRightOf="@id/listRowImage"
         android:layout_above="@id/listRowReviewCount"
         style="?android:attr/ratingBarStyleSmall"
+        android:progressTint="@color/colorPrimary"
+        android:secondaryProgressTint="@android:color/transparent"
         android:rating="4"/>
 
     <!-- Distance -->
