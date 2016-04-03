@@ -1,19 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="85dp"
+    android:padding="5dp"
+    android:layout_margin="5dp"
+    android:background="@color/colorWhite">
 
-    <!--<TextView-->
-        <!--android:id="@+id/review_name"-->
-        <!--android:text="test"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content" />-->
+    <!-- Reviewer Name -->
+    <TextView
+        android:id="@+id/reviewerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="Reviewer Name"/>
 
+    <!-- Review Rating (in stars) -->
     <RatingBar
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:stepSize="1.0"
-        android:rating="3"
-        android:numStars="5" />
+        android:id="@+id/reviewRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_below="@id/reviewerName"
+        style="?android:attr/ratingBarStyleSmall"
+        android:rating="3.5"/>
 
-</LinearLayout>
+    <!-- Review Date -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/reviewerName"
+        android:layout_toRightOf="@+id/reviewRating"
+        android:layout_toEndOf="@id/reviewRating"
+        android:layout_alignParentRight="true"
+        android:gravity="left"
+        android:text="mm/dd/yyyy"/>
+
+    <!-- Review Text -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_below="@id/reviewRating"
+        android:text="Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. " />
+
+
+</RelativeLayout>
