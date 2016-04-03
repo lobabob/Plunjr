@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="90dp"
     android:padding="5dp"
-    android:layout_margin="5dp"
     android:background="@color/colorWhite">
 
     <ImageView
@@ -45,15 +44,19 @@
 
     <!-- Average Rating (in stars) -->
     <RatingBar
+        android:id="@+id/listRowRatingBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/listRowImage"
         android:layout_above="@id/listRowReviewCount"
         style="?android:attr/ratingBarStyleSmall"
+        android:progressTint="@color/colorPrimary"
+        android:secondaryProgressTint="@android:color/transparent"
         android:rating="4"/>
 
     <!-- Distance -->
     <TextView
+        android:id="@+id/listRowDistance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/listRowTitle"
@@ -67,7 +70,7 @@
         android:layout_height="32dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:src="@drawable/button_getDirections"
+        android:src="@drawable/button_directions"
         android:background="@null"
         android:scaleType="fitXY"/>
 

@@ -10,8 +10,12 @@
     tools:showIn="@layout/activity_restroom_list">
 
     <ListView
+        android:id="@+id/restroomList"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="5dp"
+        android:layout_margin="5dp">
     </ListView>
 
 </LinearLayout>
