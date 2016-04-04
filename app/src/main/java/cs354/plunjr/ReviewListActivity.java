@@ -33,7 +33,7 @@ public class ReviewListActivity extends AppCompatActivity {
 
     private void populateReviewList(int restroomID) {
         try {
-//            JSONArray reviews = new JSONArray(getResources().getString(R.string.debug_review_json));
+            //JSONArray reviews = new JSONArray(getResources().getString(R.string.debug_review_json));
             JSONArray reviews = new PlunjrAPIClient().getReviews(this, restroomID);
 
             // Create a hash map for each row's data (one hash map per row)

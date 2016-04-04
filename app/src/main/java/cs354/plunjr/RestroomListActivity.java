@@ -65,9 +65,8 @@ public class RestroomListActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), ReviewListActivity.class);
-                // TODO: use actual restroom id and name
-                intent.putExtra("restroomID", 1);
-                intent.putExtra("restroomName", "Example Restroom Name");
+                intent.putExtra("restroomID", Integer.parseInt(restroomList.get(position).get("id")));
+                intent.putExtra("restroomName", restroomList.get(position).get("name"));
                 startActivity(intent);
             }
         });
