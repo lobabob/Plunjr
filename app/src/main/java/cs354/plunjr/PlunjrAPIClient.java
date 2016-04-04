@@ -19,10 +19,6 @@ import java.net.URLEncoder;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-
-/**
- * Created by Christian on 4/3/2016.
- */
 public class PlunjrAPIClient {
 
     private static final String LOG_TAG = "API Client";
@@ -62,28 +58,23 @@ public class PlunjrAPIClient {
         return arr;
     }
 
-    public JSONArray postReview(Context context, int restroomID, Map<String, Object> params) {
+    public JSONArray postReview(Context context, String address, String user, String rating,
+                                String title, String description) {
         String res = "";
-        StringBuilder postData = new StringBuilder();
         JSONArray arr = new JSONArray();
+        PlunjrPost post = new PlunjrPost();
 
         // Transform parameters into a correctly formatted string
-        try {
-            for (Map.Entry<String, Object> e : params.entrySet()) {
-                postData.append(URLEncoder.encode(String.valueOf(e.getKey()), "utf-8"));
-                postData.append("=");
-                postData.append(URLEncoder.encode(String.valueOf(e.getValue()), "utf-8"));
-                postData.append("&");
-            }
-            postData.setLength(postData.length() - 1);
-        } catch (Exception e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-        }
+        String postData = post.combineParams(
+                new String[]{"address", address},
+                new String[]{"user", user},
+                new String[]{"rating", rating},
+                new String[]{"title", title},
+                new String[]{"description", description});
 
         // Make POST request to API
         try {
-            res = new PlunjrGet().execute(String.format(context.getString(R.string.post_review_uri),
-                    restroomID), postData.toString()).get();
+            res = post.execute(context.getString(R.string.post_review_uri), postData).get();
         } catch(Exception e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
@@ -136,6 +127,27 @@ public class PlunjrAPIClient {
     }
 
     private class PlunjrPost extends AsyncTask<String, Void, String> {
+
+        public String combineParams(String[]... params) {
+            StringBuilder combined = new StringBuilder();
+
+            try {
+                for (String[] p : params) {
+                    combined.append(URLEncoder.encode(p[0], "utf-8"));
+                    combined.append("=");
+                    combined.append(URLEncoder.encode(p[1], "utf-8"));
+                    combined.append("&");
+                }
+
+                if (combined.length() > 1) {
+                    combined.setLength(combined.length() - 1);
+                }
+            } catch (Exception e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+            }
+
+            return combined.toString();
+        }
 
         @Override
         protected String doInBackground(String... params) {
