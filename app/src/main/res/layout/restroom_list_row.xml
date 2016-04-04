@@ -64,7 +64,7 @@
         android:gravity="right"
         android:text="Dist"/>
 
-    <!-- Get Directions -->
+    <!-- Get Directions
     <ImageButton
         android:layout_width="32dp"
         android:layout_height="32dp"
@@ -73,5 +73,6 @@
         android:src="@drawable/button_directions"
         android:background="@null"
         android:scaleType="fitXY"/>
+        -->
 
 </RelativeLayout>

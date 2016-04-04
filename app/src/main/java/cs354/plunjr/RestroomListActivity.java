@@ -1,5 +1,6 @@
 package cs354.plunjr;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RatingBar;
@@ -58,6 +60,18 @@ public class RestroomListActivity extends AppCompatActivity {
         SimpleAdapter restroomListViewAdapter = new SimpleAdapter(this, restroomList, R.layout.restroom_list_row, from, to);
         restroomListViewAdapter.setViewBinder(new RestroomListViewBinder());
         restroomListView.setAdapter(restroomListViewAdapter);
+
+        // Set on click listener to launch review list activity for a chosen restroom
+        restroomListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(RestroomListActivity.this, ReviewListActivity.class);
+                // TODO: use actual restroom id
+                intent.putExtra("restroomID", "0");
+                startActivity(intent);
+            }
+        });
+        restroomListView.setItemsCanFocus(false);
     }
 
     // TODO: choose either action bar or floating action button, not both
