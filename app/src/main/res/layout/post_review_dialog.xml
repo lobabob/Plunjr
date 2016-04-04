@@ -5,21 +5,43 @@
     android:layout_height="match_parent"
     android:padding="10dp">
 
+    <!-- Field required warning (address) -->
+    <TextView
+        android:id="@+id/dialog_address_warning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_address_warning"
+        android:textColor="@color/colorPrimary"
+        android:visibility="gone"/>
+
+    <!-- Address entry -->
     <EditText
+        android:id="@+id/dialog_address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPostalAddress"
         android:hint="@string/dialog_address_hint"/>
 
+    <!-- Use user location button -->
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/dialog_use_location_button"/>
 
+    <!-- Field required warning (rating) -->
+    <TextView
+        android:id="@+id/dialog_rating_warning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_rating_warning"
+        android:textColor="@color/colorPrimary"
+        android:visibility="gone"/>
+
+    <!-- Rating -->
     <RatingBar
+        android:id="@+id/dialog_rating"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
         android:layout_gravity="center"
         android:progressTint="@color/colorPrimary"
         android:secondaryProgressTint="@color/colorPrimaryDark"
@@ -27,7 +49,9 @@
         android:clickable="true"
         android:numStars="5"/>
 
+    <!-- Optional review entry -->
     <EditText
+        android:id="@+id/dialog_review"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="text"
