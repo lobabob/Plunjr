@@ -18,6 +18,7 @@
     <!-- API endpoints -->
     <string name="get_restrooms_uri">http://104.130.132.153/api/restrooms/</string>
     <string name="get_reviews_uri">http://104.130.132.153/api/restrooms/%d/reviews</string>
+    <string name="post_review_uri">http://104.130.132.153/api/restrooms/%d/review</string>
 
     <!-- TODO: Remove when not needed -->
     <string name="debug_json">
