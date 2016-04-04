@@ -49,6 +49,7 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/listRowImage"
         android:layout_above="@id/listRowReviewCount"
+        android:isIndicator="true"
         style="?android:attr/ratingBarStyleSmall"
         android:progressTint="@color/colorPrimary"
         android:secondaryProgressTint="@android:color/transparent"

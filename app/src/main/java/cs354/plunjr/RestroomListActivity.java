@@ -48,7 +48,7 @@ public class RestroomListActivity extends AppCompatActivity {
                 restroomList.add(rowData);
             }
         } catch (JSONException e) {
-            Toast.makeText(this, "JSON exception while populating list", Toast.LENGTH_SHORT);
+            Toast.makeText(this, "JSON exception while populating list", Toast.LENGTH_SHORT).show();
             Log.e("Restroom List", e.getMessage(), e);
         }
         String[] from = {"name", "address", "averageRating", "reviewCount"};
@@ -64,9 +64,10 @@ public class RestroomListActivity extends AppCompatActivity {
         restroomListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(RestroomListActivity.this, ReviewListActivity.class);
-                // TODO: use actual restroom id
-                intent.putExtra("restroomID", "0");
+                Intent intent = new Intent(getApplicationContext(), ReviewListActivity.class);
+                // TODO: use actual restroom id and name
+                intent.putExtra("restroomID", 1);
+                intent.putExtra("restroomName", "Example Restroom Name");
                 startActivity(intent);
             }
         });

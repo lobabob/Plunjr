@@ -40,6 +40,23 @@ public class PlunjrAPIClient {
         return arr;
     }
 
+    public JSONArray getReviews(Context context, int restroomID) {
+        String res = "";
+        try {
+            res = new PlunjrGet().execute(String.format(context.getString(R.string.get_reviews_uri), restroomID)).get();
+        } catch(Exception e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+        }
+        // Convert response to JSON array
+        JSONArray arr = new JSONArray();
+        try {
+            arr = new JSONArray(res);
+        } catch(JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+        }
+        return arr;
+    }
+
     private class PlunjrGet extends AsyncTask<String, Void, String> {
 
         @Override

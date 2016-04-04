@@ -1,8 +1,6 @@
 package cs354.plunjr;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -11,7 +9,6 @@ import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,20 +27,14 @@ import java.util.Map;
 
 public class ReviewListActivity extends AppCompatActivity {
 
-    private DateFormat PARSE_DATE_PATTERN = new SimpleDateFormat(
-            getResources().getString(R.string.review_parse_date), Locale.ROOT);
-    private DateFormat FORMAT_DATE_PATTERN = new SimpleDateFormat(
-            getResources().getString(R.string.review_format_date), Locale.ROOT);
-
-    private List<Map<String, String>> reviewList = new ArrayList<Map<String, String>>();
-
-    ReviewListActivity self;
+    private DateFormat parseDatePattern;
+    private DateFormat formatDatePattern;
+    private List<Map<String, String>> reviewList = new ArrayList<>();
 
     private void populateReviewList(int restroomID) {
         try {
-            // TODO: get JSON object through http request instead, use restroomID in request
-            JSONObject res = new JSONObject(getResources().getString(R.string.debug_review_json));
-            JSONArray reviews = res.optJSONArray("reviews");
+//            JSONArray reviews = new JSONArray(getResources().getString(R.string.debug_review_json));
+            JSONArray reviews = new PlunjrAPIClient().getReviews(this, restroomID);
 
             // Create a hash map for each row's data (one hash map per row)
             for(int i = 0; i < reviews.length(); i++) {
@@ -58,14 +49,13 @@ public class ReviewListActivity extends AppCompatActivity {
                 reviewList.add(rowData);
             }
         } catch(JSONException e) {
-            Toast.makeText(this, "JSON exception while populating list", Toast.LENGTH_SHORT).show();
             Log.e("Review List", e.getMessage(), e);
         }
     }
 
     private void initReviewListAdapter() {
-        String[] from = {"name", "date", "rating", "text"};
-        int[] to = {R.id.reviewerName, R.id.reviewDate, R.id.reviewRating, R.id.reviewText};
+        String[] from = {"user", "date", "rating", "title", "description"};
+        int[] to = {R.id.reviewerName, R.id.reviewDate, R.id.reviewRating, R.id.reviewTitle, R.id.reviewDescription};
 
         // Bind data in each hash map to a corresponding row in the list view
         ListView reviewListView = (ListView) findViewById(R.id.reviewList);
@@ -82,13 +72,17 @@ public class ReviewListActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        parseDatePattern = new SimpleDateFormat(
+            getResources().getString(R.string.review_parse_date), Locale.ROOT);
+        formatDatePattern = new SimpleDateFormat(
+            getResources().getString(R.string.review_format_date), Locale.ROOT);
+
         Bundle extras = getIntent().getExtras();
         int restroomID = extras.getInt("restroomID");
+        setTitle(extras.getString("restroomName"));
 
         populateReviewList(restroomID);
         initReviewListAdapter();
-
-        self = this;
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
@@ -111,14 +105,17 @@ public class ReviewListActivity extends AppCompatActivity {
 
                 if(view.getId() == R.id.reviewDate) {
                     try {
-                        Date date = PARSE_DATE_PATTERN.parse(textRepresentation);
-                        textRepresentation = FORMAT_DATE_PATTERN.format(date);
+                        Date date = parseDatePattern.parse(textRepresentation);
+                        textRepresentation = formatDatePattern.format(date);
                     } catch (ParseException e) {
-                        Toast.makeText(self, "Exception while parsing/formatting date", Toast.LENGTH_SHORT).show();
                         Log.e("Date parsing/formatting", e.getMessage(), e);
 
                         textRepresentation = "Invalid Date";
                     }
+                }
+
+                if (textRepresentation.equals("")) {
+                    view.setVisibility(View.GONE);
                 }
 
                 text.setText(textRepresentation);
