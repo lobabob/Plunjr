@@ -3,6 +3,8 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_review_list">ReviewListActivity</string>
     <string name="review_count_format">Based on %s reviews</string>
+    <string name="review_parse_date">MM-dd-yyyy</string>
+    <string name="review_format_date">MM/dd/yyyy</string>
 
     <!-- For "post review" dialog -->
     <string name="dialog_title">Rate a Restroom</string>
@@ -27,6 +29,25 @@
                     \"address\":\"Anywhere but here\",
                     \"rating\":\"3.5\",
                     \"ratingCount\":\"27\"
+                }
+            ]
+        }"
+    </string>
+
+    <string name="debug_review_json">
+        "{
+            \"reviews\": [
+                {
+                    \"name\":\"DaWorstReviewer\",
+                    \"date\":\"03-04-2015\",
+                    \"rating\":\"3.5\",
+                    \"text\":\"Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. \"
+                },
+                {
+                    \"name\":\"DaBestReviewer\",
+                    \"date\":\"01-05-2016\",
+                    \"rating\":\"3.5\",
+                    \"text\":\"Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. \"
                 }
             ]
         }"
