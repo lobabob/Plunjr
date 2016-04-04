@@ -16,6 +16,9 @@
     <string name="dialog_address_warning">Address is required</string>
     <string name="dialog_rating_warning">Rating is required</string>
 
+    <!-- API endpoints -->
+    <string name="get_restrooms_uri">http://104.130.132.153/api/restrooms/</string>
+
     <!-- TODO: Remove when not needed -->
     <string name="debug_json">
         "{

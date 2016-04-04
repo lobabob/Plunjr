@@ -20,6 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,13 +29,11 @@ import java.util.Map;
 
 public class RestroomListActivity extends AppCompatActivity {
 
-    private List<Map<String, String>> restroomList = new ArrayList<Map<String, String>>();
+    private List<Map<String, String>> restroomList = new ArrayList<>();
 
     private void initRestroomList() {
         try {
-            // TODO: get JSON object through http request instead
-            JSONObject res = new JSONObject(getResources().getString(R.string.debug_json));
-            JSONArray restrooms = res.optJSONArray("restrooms");
+            JSONArray restrooms = new PlunjrAPIClient().getRestrooms(this);
 
             // Create a hash map for each row's data (one hash map per row)
             for(int i = 0; i < restrooms.length(); i++) {
@@ -48,11 +47,11 @@ public class RestroomListActivity extends AppCompatActivity {
                 }
                 restroomList.add(rowData);
             }
-        } catch(JSONException e) {
+        } catch (JSONException e) {
             Toast.makeText(this, "JSON exception while populating list", Toast.LENGTH_SHORT);
             Log.e("Restroom List", e.getMessage(), e);
         }
-        String[] from = {"name", "address", "rating", "ratingCount"};
+        String[] from = {"name", "address", "averageRating", "reviewCount"};
         int[] to = {R.id.listRowTitle, R.id.listRowAddress, R.id.listRowRatingBar, R.id.listRowReviewCount};
 
         // Bind data in each hash map to a corresponding row in the list view
