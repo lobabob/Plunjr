@@ -35,8 +35,16 @@ public class WriteReviewDialogFragment extends DialogFragment {
                 b.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+
+                        String address = ((EditText) dialogView.findViewById(R.id.dialog_address)).getText().toString();
+                        String review  = ((EditText) dialogView.findViewById(R.id.dialog_review)).getText().toString();
+                        String title   = ((EditText) dialogView.findViewById(R.id.dialog_title)).getText().toString();
+                        String rating  = String.valueOf(((RatingBar) dialogView.findViewById(R.id.dialog_rating)).getRating());
+
+                        // Post review if input is valid
                         if(validateInput(dialogView)) {
-                            // TODO: send form data to server
+                            PlunjrAPIClient client = new PlunjrAPIClient();
+                            client.postReview(getActivity(), address, getString(R.string.default_user), rating, title, review);
                             d.dismiss();
                         }
                     }
@@ -48,11 +56,14 @@ public class WriteReviewDialogFragment extends DialogFragment {
 
     private boolean validateInput(View v) {
         EditText address = (EditText)  v.findViewById(R.id.dialog_address);
+        EditText desc    = (EditText)  v.findViewById(R.id.dialog_review);
+        EditText title   = (EditText)  v.findViewById(R.id.dialog_title);
         RatingBar rating = (RatingBar) v.findViewById(R.id.dialog_rating);
         boolean valid = true;
 
         View addressWarning = v.findViewById(R.id.dialog_address_warning);
         View ratingWarning  = v.findViewById(R.id.dialog_rating_warning);
+        View titleWarning   = v.findViewById(R.id.dialog_title_warning);
 
         // Validate address
         if(address.getText().toString().length() <= 0) {
@@ -67,6 +78,13 @@ public class WriteReviewDialogFragment extends DialogFragment {
             valid = false;
         } else {
             ratingWarning.setVisibility(View.GONE);
+        }
+        // Validate title + description (must have both if there is a title)
+        if(title.getText().toString().length() > 0 && desc.getText().toString().length() <= 0) {
+            titleWarning.setVisibility(View.VISIBLE);
+            valid = false;
+        } else {
+            titleWarning.setVisibility(View.GONE);
         }
         return valid;
     }

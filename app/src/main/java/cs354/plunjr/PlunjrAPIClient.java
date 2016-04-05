@@ -6,12 +6,17 @@ import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -58,19 +63,25 @@ public class PlunjrAPIClient {
         return arr;
     }
 
-    public JSONArray postReview(Context context, String address, String user, String rating,
+    public JSONObject postReview(Context context, String address, String user, String rating,
                                 String title, String description) {
         String res = "";
-        JSONArray arr = new JSONArray();
+        JSONObject resObj = new JSONObject();
         PlunjrPost post = new PlunjrPost();
 
         // Transform parameters into a correctly formatted string
-        String postData = post.combineParams(
-                new String[]{"address", address},
-                new String[]{"user", user},
-                new String[]{"rating", rating},
-                new String[]{"title", title},
-                new String[]{"description", description});
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("address", address);
+            obj.put("user", user);
+            obj.put("rating", rating);
+            obj.put("title", title);
+            obj.put("description", description);
+            obj.put("name", "");
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+        }
+        String postData = obj.toString();
 
         // Make POST request to API
         try {
@@ -78,15 +89,13 @@ public class PlunjrAPIClient {
         } catch(Exception e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
-
         // Convert response to JSON array
         try {
-            arr = new JSONArray(res);
+            resObj = new JSONObject(res);
         } catch(JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
-
-        return arr;
+        return resObj;
     }
 
     private class PlunjrGet extends AsyncTask<String, Void, String> {
@@ -167,15 +176,16 @@ public class PlunjrAPIClient {
                 // Open connection and prepare to send postData
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setDoOutput(true);
+                connection.setDoInput(true);
                 connection.setRequestMethod("POST");
-                connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("charset", "utf-8");
                 connection.setRequestProperty("Content-Length", Integer.toString(postData.length()));
                 connection.setUseCaches(false);
 
                 // Send postData
-                DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-                wr.write(postData.getBytes("utf-8"));
+                Writer wr = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()));
+                wr.write(postData);
                 wr.close();
 
                 // Receive Response

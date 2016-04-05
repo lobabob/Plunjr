@@ -15,18 +15,27 @@
         android:visibility="gone"/>
 
     <!-- Address entry -->
-    <EditText
-        android:id="@+id/dialog_address"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPostalAddress"
-        android:hint="@string/dialog_address_hint"/>
+        android:orientation="horizontal">
 
-    <!-- Use user location button -->
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/dialog_use_location_button"/>
+        <EditText
+            android:id="@+id/dialog_address"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="textPostalAddress"
+            android:hint="@string/dialog_address_hint"/>
+
+        <!-- Use user location button -->
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_my_location"
+            android:tint="@color/colorBlue"/>
+
+    </LinearLayout>
 
     <!-- Field required warning (rating) -->
     <TextView
@@ -49,12 +58,34 @@
         android:clickable="true"
         android:numStars="5"/>
 
+    <!-- Field required warning (title + desc) -->
+    <TextView
+        android:id="@+id/dialog_title_warning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_title_warning"
+        android:textColor="@color/colorPrimary"
+        android:visibility="gone"/>
+
+    <!-- Optional title entry -->
+    <EditText
+        android:id="@+id/dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:hint="@string/dialog_title_hint"/>
+
     <!-- Optional review entry -->
     <EditText
         android:id="@+id/dialog_review"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="text"
+        android:gravity="top"
+        android:lines="10"
+        android:minLines="3"
+        android:singleLine="false"
+        android:scrollHorizontally="false"
+        android:inputType="textMultiLine"
         android:hint="@string/dialog_review_hint"/>
 
 </LinearLayout>

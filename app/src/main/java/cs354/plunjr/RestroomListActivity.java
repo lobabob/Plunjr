@@ -45,6 +45,11 @@ public class RestroomListActivity extends AppCompatActivity {
                     String key = keys.next();
                     rowData.put(key, restroom.optString(key));
                 }
+                // Swap address and name if name is null
+                if(rowData.get("name").equals("")) {
+                    rowData.put("name", rowData.get("address"));
+                    rowData.put("address", "");
+                }
                 restroomList.add(rowData);
             }
         } catch (JSONException e) {
@@ -86,6 +91,7 @@ public class RestroomListActivity extends AppCompatActivity {
             }
         });
         // Floating Action Button
+        /*
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,6 +99,7 @@ public class RestroomListActivity extends AppCompatActivity {
                 dialog.show(getFragmentManager(), "dialog");
             }
         });
+        */
     }
 
     @Override

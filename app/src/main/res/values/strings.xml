@@ -4,16 +4,19 @@
     <string name="review_count_format">Based on %s reviews</string>
     <string name="review_parse_date">yyyy-MM-dd</string>
     <string name="review_format_date">M/d/yy</string>
+    <string name="default_user">Anonymous</string>
 
     <!-- For "post review" dialog -->
     <string name="dialog_title">Rate a Restroom</string>
     <string name="dialog_address_hint">Restroom Address</string>
-    <string name="dialog_review_hint">Write a Review (Optional)</string>
+    <string name="dialog_title_hint">Title (Optional)</string>
+    <string name="dialog_review_hint">Description (Optional)</string>
     <string name="dialog_use_location_button">Use My Location</string>
     <string name="dialog_submit">Post Review</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="dialog_address_warning">Address is required</string>
     <string name="dialog_rating_warning">Rating is required</string>
+    <string name="dialog_title_warning">Cannot have title without description</string>
 
     <!-- API endpoints -->
     <string name="get_restrooms_uri">http://104.130.132.153/api/restrooms/</string>
