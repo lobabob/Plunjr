@@ -1,6 +1,9 @@
 package cs354.plunjr;
 
 import android.content.Intent;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -16,20 +19,27 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class RestroomListActivity extends AppCompatActivity {
+public class RestroomListActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private List<Map<String, String>> restroomList = new ArrayList<>();
+    private GoogleMap mMap;
 
     private void initRestroomList() {
         try {
@@ -107,8 +117,30 @@ public class RestroomListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restroom_list);
 
+        // Begin map initialization
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
         initRestroomList();
         initReviewDialog();
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.setMyLocationEnabled(true);
+
+        // Get user location
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        String provider = locationManager.getBestProvider(new Criteria(), true);
+        Location location = locationManager.getLastKnownLocation(provider);
+
+        // Zoom in on user's current location
+        if(location != null) {
+            LatLng myPosition = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 15.5f));
+        }
     }
 
     @Override
