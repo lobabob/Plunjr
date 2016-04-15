@@ -7,6 +7,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
@@ -39,6 +40,7 @@ import java.util.Map;
 public class RestroomListActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private List<Map<String, String>> restroomList = new ArrayList<>();
+    private WriteReviewDialogFragment mDialog;
     private GoogleMap mMap;
 
     private void initRestroomList() {
@@ -88,42 +90,21 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         restroomListView.setItemsCanFocus(false);
     }
 
-    // TODO: choose either action bar or floating action button, not both
-    private void initReviewDialog() {
-        final WriteReviewDialogFragment dialog = new WriteReviewDialogFragment();
-
-        // Action bar button
-        ImageButton writeReviewButton = (ImageButton) findViewById(R.id.write_review_button);
-        writeReviewButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.show(getFragmentManager(), "dialog");
-            }
-        });
-        // Floating Action Button
-        /*
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.show(getFragmentManager(), "dialog");
-            }
-        });
-        */
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restroom_list);
+
+        // Set up toolbar
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
 
         // Begin map initialization
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        mDialog = new WriteReviewDialogFragment();
         initRestroomList();
-        initReviewDialog();
     }
 
     @Override
@@ -152,16 +133,15 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.action_review:
+                mDialog.show(getFragmentManager(), "dialog");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     private class RestroomListViewBinder implements SimpleAdapter.ViewBinder {
