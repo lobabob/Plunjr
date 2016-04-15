@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="90dp"
     android:padding="5dp"
-    android:background="@color/colorWhite">
+    android:background="@color/colorWhite"
+    android:descendantFocusability="blocksDescendants">
 
     <ImageView
         android:id="@+id/listRowImage"
