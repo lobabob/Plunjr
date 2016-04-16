@@ -1,23 +1,16 @@
 package cs354.plunjr;
 
-import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AdapterView;
-import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.RatingBar;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -25,69 +18,46 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class RestroomListActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private List<Map<String, String>> restroomList = new ArrayList<>();
     private WriteReviewDialogFragment mDialog;
     private GoogleMap mMap;
 
     private void initRestroomList() {
+        List<RestroomListAdapter.RestroomInfo> restroomList = new ArrayList<>();
         try {
             JSONArray restrooms = new PlunjrAPIClient().getRestrooms(this);
 
-            // Create a hash map for each row's data (one hash map per row)
             for(int i = 0; i < restrooms.length(); i++) {
                 JSONObject restroom = restrooms.getJSONObject(i);
-                HashMap<String, String> rowData = new HashMap<>();
+                RestroomListAdapter.RestroomInfo rrInfo = new RestroomListAdapter.RestroomInfo();
 
-                Iterator<String> keys = restroom.keys();
-                while(keys.hasNext()) {
-                    String key = keys.next();
-                    rowData.put(key, restroom.optString(key));
-                }
-                // Swap address and name if name is null
-                if(rowData.get("name").equals("")) {
-                    rowData.put("name", rowData.get("address"));
-                    rowData.put("address", "");
-                }
-                restroomList.add(rowData);
+                rrInfo.name = restroom.optString("name");
+                rrInfo.address = restroom.optString("address");
+                rrInfo.rating = (float) restroom.optDouble("averageRating");
+                rrInfo.reviewCount = restroom.optInt("reviewCount");
+                rrInfo.id = restroom.optInt("id");
+
+                restroomList.add(rrInfo);
             }
         } catch (JSONException e) {
             Toast.makeText(this, "JSON exception while populating list", Toast.LENGTH_SHORT).show();
             Log.e("Restroom List", e.getMessage(), e);
         }
-        String[] from = {"name", "address", "averageRating", "reviewCount"};
-        int[] to = {R.id.listRowTitle, R.id.listRowAddress, R.id.listRowRatingBar, R.id.listRowReviewCount};
-
-        // Bind data in each hash map to a corresponding row in the list view
-        ListView restroomListView = (ListView) findViewById(R.id.restroomList);
-        SimpleAdapter restroomListViewAdapter = new SimpleAdapter(this, restroomList, R.layout.restroom_list_row, from, to);
-        restroomListViewAdapter.setViewBinder(new RestroomListViewBinder());
-        restroomListView.setAdapter(restroomListViewAdapter);
-
-        // Set on click listener to launch review list activity for a chosen restroom
-        restroomListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), ReviewListActivity.class);
-                intent.putExtra("restroomID", Integer.parseInt(restroomList.get(position).get("id")));
-                intent.putExtra("restroomName", restroomList.get(position).get("name"));
-                startActivity(intent);
-            }
-        });
-        restroomListView.setItemsCanFocus(false);
+        RecyclerView restroomListView = (RecyclerView) findViewById(R.id.restroomList);
+        restroomListView.setHasFixedSize(true);
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        restroomListView.setLayoutManager(llm);
+        restroomListView.setAdapter(new RestroomListAdapter(restroomList));
     }
 
     @Override
@@ -141,27 +111,6 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private class RestroomListViewBinder implements SimpleAdapter.ViewBinder {
-
-        @Override
-        public boolean setViewValue(View view, Object data, String textRepresentation) {
-            if(view.getId() == R.id.listRowRatingBar) {
-                RatingBar bar = (RatingBar) view;
-                bar.setRating(Float.parseFloat(textRepresentation));
-            } else if(view.getId() == R.id.listRowDistance) {
-                // TODO: calculate distance from user and bind value to view
-            } else {
-                TextView text = (TextView) view;
-
-                if(view.getId() == R.id.listRowReviewCount) {
-                    textRepresentation = String.format(getResources().getString(R.string.review_count_format), textRepresentation);
-                }
-                text.setText(textRepresentation);
-            }
-            return true;
         }
     }
 }
