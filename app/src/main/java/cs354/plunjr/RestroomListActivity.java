@@ -120,7 +120,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         // Zoom in on user's current location
         if(location != null) {
             LatLng myPosition = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 15.5f));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 15.5f));
         }
     }
 
