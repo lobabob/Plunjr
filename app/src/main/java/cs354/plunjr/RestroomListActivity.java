@@ -4,6 +4,10 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -66,8 +71,29 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         setContentView(R.layout.activity_restroom_list);
 
         // Set up toolbar
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.colorWhite));
 
+        final CollapsingToolbarLayout ctl = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbar);
+        ctl.setTitleEnabled(false);
+
+        // Fade toolbar in/out on scroll
+        final AppBarLayout appBar = (AppBarLayout) findViewById(R.id.appbar);
+        appBar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                float curHeight = ctl.getHeight() + verticalOffset;
+                float scrimThreshold = 2 * ViewCompat.getMinimumHeight(ctl);
+
+                // Start fading from alpha=0 at the scrim threshold, reach alpha=1 at min height
+                if(curHeight < scrimThreshold) {
+                    toolbar.setAlpha(2 * (1 - curHeight / scrimThreshold));
+                } else {
+                    toolbar.setAlpha(0);
+                }
+            }
+        });
         // Begin map initialization
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -81,6 +107,8 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        mMap.getUiSettings().setAllGesturesEnabled(false);
 
         // Get user location
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
