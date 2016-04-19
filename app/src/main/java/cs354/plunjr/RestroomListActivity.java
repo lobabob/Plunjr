@@ -1,13 +1,17 @@
 package cs354.plunjr;
 
+import android.graphics.Rect;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.OnApplyWindowInsetsListener;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.view.WindowInsetsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -63,6 +67,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         restroomListView.setLayoutManager(llm);
         restroomListView.setAdapter(new RestroomListAdapter(restroomList));
+        restroomListView.addItemDecoration(new RestroomListAdapter.Divider(this, 1));
     }
 
     @Override
@@ -81,11 +86,19 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         // Fade toolbar in/out on scroll
         final AppBarLayout appBar = (AppBarLayout) findViewById(R.id.appbar);
         appBar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            private int mStatusBarHeight;
+
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                float curHeight = ctl.getHeight() + verticalOffset;
+                float curHeight = ctl.getHeight() + verticalOffset - mStatusBarHeight;
                 float scrimThreshold = 2 * ViewCompat.getMinimumHeight(ctl);
 
+                // Calculate status bar height if frame insets are supported (Kitkat+)
+                if(Build.VERSION.SDK_INT >= 19 && mStatusBarHeight <= 0) {
+                    Rect displayRect = new Rect();
+                    getWindow().getDecorView().getWindowVisibleDisplayFrame(displayRect);
+                    mStatusBarHeight = displayRect.top;
+                }
                 // Start fading from alpha=0 at the scrim threshold, reach alpha=1 at min height
                 if(curHeight < scrimThreshold) {
                     toolbar.setAlpha(2 * (1 - curHeight / scrimThreshold));

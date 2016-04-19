@@ -1,7 +1,10 @@
 package cs354.plunjr;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,5 +86,23 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
         protected int reviewCount;
         protected float rating;
         protected int id;
+    }
+
+    public static class Divider extends RecyclerView.ItemDecoration {
+
+        private final int mHeight;
+
+        public Divider(Context context, int height) {
+            // Convert height value from dp to px
+            height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, height, context.getResources().getDisplayMetrics());
+            this.mHeight = height;
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
+                                   RecyclerView.State state) {
+            outRect.bottom = mHeight;
+        }
+
     }
 }
