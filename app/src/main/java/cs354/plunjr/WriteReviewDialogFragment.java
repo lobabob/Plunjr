@@ -20,7 +20,6 @@ import android.widget.ImageButton;
 import android.widget.RatingBar;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Locale;
 
 
