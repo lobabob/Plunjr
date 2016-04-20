@@ -1,20 +1,47 @@
 package cs354.plunjr;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.location.Address;
+import android.location.Criteria;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.RatingBar;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 
 /**
  * Created by Christian on 3/31/2016.
  */
 public class WriteReviewDialogFragment extends DialogFragment {
+
+    Geocoder geocoder;
+    LocationManager locationManager;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if(geocoder == null) {
+            geocoder = new Geocoder(activity, Locale.getDefault());
+        }
+        if(locationManager == null) {
+            locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+        }
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -49,6 +76,25 @@ public class WriteReviewDialogFragment extends DialogFragment {
                         }
                     }
                 });
+            }
+        });
+        // Set address to current user location on button click
+        ImageButton userLocation = (ImageButton) dialogView.findViewById(R.id.dialog_button_user_location);
+        userLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText addressField = (EditText) dialogView.findViewById(R.id.dialog_address);
+                String provider = locationManager.getBestProvider(new Criteria(), true);
+                Location location = locationManager.getLastKnownLocation(provider);
+                try {
+                    Address address = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0);
+                    String addressString = address.getAddressLine(0) + " "
+                            + address.getLocality() + " "
+                            + address.getAdminArea();
+                    addressField.setText(addressString);
+                } catch(IOException e) {
+                    Log.e("Dialog", e.getMessage(), e);
+                }
             }
         });
         return d;
