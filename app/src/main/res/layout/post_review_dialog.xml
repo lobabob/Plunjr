@@ -20,12 +20,13 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/dialog_address"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:inputType="textPostalAddress"
+            android:completionThreshold="5"
             android:hint="@string/dialog_address_hint"/>
 
         <!-- Use user location button -->
