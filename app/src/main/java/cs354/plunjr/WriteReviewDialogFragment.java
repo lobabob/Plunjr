@@ -1,5 +1,6 @@
 package cs354.plunjr;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -13,6 +14,24 @@ import android.widget.RatingBar;
 
 
 public class WriteReviewDialogFragment extends DialogFragment {
+
+    // Used to notify parent activity of a positive click
+    public interface WriteReviewDialogListener {
+        public void onDialogPositiveClick();
+    }
+
+    WriteReviewDialogListener mWriteReviewDialogListener;
+
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mWriteReviewDialogListener = (WriteReviewDialogListener) activity;
+        } catch(ClassCastException e) {
+            // Parent activity must implement WriteReviewDialogListener interface
+        }
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -43,6 +62,7 @@ public class WriteReviewDialogFragment extends DialogFragment {
                         if(validateInput(dialogView)) {
                             PlunjrAPIClient client = new PlunjrAPIClient();
                             client.postReview(getActivity(), address, getString(R.string.default_user), rating, title, review);
+                            mWriteReviewDialogListener.onDialogPositiveClick();
                             d.dismiss();
                         }
                     }

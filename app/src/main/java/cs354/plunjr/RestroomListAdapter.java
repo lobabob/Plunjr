@@ -61,6 +61,14 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
         return restrooms.size();
     }
 
+    public void clear() {
+        restrooms.clear();
+    }
+
+    public boolean add(RestroomInfo rr) {
+        return restrooms.add(rr);
+    }
+
     public static class RestroomViewHolder extends RecyclerView.ViewHolder {
 
         protected TextView name;

@@ -30,16 +30,27 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class RestroomListActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class RestroomListActivity extends AppCompatActivity implements OnMapReadyCallback, WriteReviewDialogFragment.WriteReviewDialogListener {
 
+    private RestroomListAdapter mRestroomListAdapter;
     private WriteReviewDialogFragment mDialog;
     private GoogleMap mMap;
 
     private void initRestroomList() {
-        List<RestroomListAdapter.RestroomInfo> restroomList = new ArrayList<>();
+        RecyclerView restroomListView = (RecyclerView) findViewById(R.id.restroomList);
+        restroomListView.setHasFixedSize(true);
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        restroomListView.setLayoutManager(llm);
+        restroomListView.setAdapter(mRestroomListAdapter);
+        restroomListView.addItemDecoration(new RestroomListAdapter.Divider(this, 1));
+        loadRestrooms();
+    }
+
+    private void loadRestrooms() {
         try {
+            mRestroomListAdapter.clear();
             JSONArray restrooms = new PlunjrAPIClient().getRestrooms(this);
 
             for(int i = 0; i < restrooms.length(); i++) {
@@ -52,19 +63,13 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
                 rrInfo.reviewCount = restroom.optInt("reviewCount");
                 rrInfo.id = restroom.optInt("id");
 
-                restroomList.add(rrInfo);
+                mRestroomListAdapter.add(rrInfo);
             }
+            mRestroomListAdapter.notifyDataSetChanged();
         } catch (JSONException e) {
             Toast.makeText(this, "JSON exception while populating list", Toast.LENGTH_SHORT).show();
             Log.e("Restroom List", e.getMessage(), e);
         }
-        RecyclerView restroomListView = (RecyclerView) findViewById(R.id.restroomList);
-        restroomListView.setHasFixedSize(true);
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-        restroomListView.setLayoutManager(llm);
-        restroomListView.setAdapter(new RestroomListAdapter(restroomList));
-        restroomListView.addItemDecoration(new RestroomListAdapter.Divider(this, 1));
     }
 
     @Override
@@ -110,6 +115,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         mapFragment.getMapAsync(this);
 
         mDialog = new WriteReviewDialogFragment();
+        mRestroomListAdapter = new RestroomListAdapter(new ArrayList<RestroomListAdapter.RestroomInfo>());
         initRestroomList();
     }
 
@@ -150,5 +156,10 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onDialogPositiveClick() {
+        loadRestrooms();
     }
 }
