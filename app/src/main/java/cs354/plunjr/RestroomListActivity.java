@@ -10,6 +10,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 public class RestroomListActivity extends AppCompatActivity implements OnMapReadyCallback, WriteReviewDialogFragment.WriteReviewDialogListener {
 
     private RestroomListAdapter mRestroomListAdapter;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private WriteReviewDialogFragment mDialog;
     private GoogleMap mMap;
 
@@ -72,6 +74,13 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         }
     }
 
+    private void refreshRestrooms() {
+        Toast.makeText(getApplicationContext(), "Reloading restrooms...", Toast.LENGTH_SHORT).show();
+        mSwipeRefreshLayout.setRefreshing(true);
+        loadRestrooms();
+        mSwipeRefreshLayout.setRefreshing(false);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,6 +116,14 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
                 } else {
                     toolbar.setAlpha(0);
                 }
+            }
+        });
+        // Refresh restroom list on swipe gesture
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.restroomListSwipeRefresh);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshRestrooms();
             }
         });
         // Begin map initialization
@@ -160,6 +177,6 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
 
     @Override
     public void onDialogPositiveClick() {
-        loadRestrooms();
+        refreshRestrooms();
     }
 }
