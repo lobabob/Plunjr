@@ -70,7 +70,6 @@ public class PlunjrAPIClient {
                                 String title, String description) {
         String res = "";
         JSONObject resObj = new JSONObject();
-        PlunjrPost post = new PlunjrPost();
 
         // Transform parameters into a correctly formatted string
         JSONObject obj = new JSONObject();
@@ -88,8 +87,9 @@ public class PlunjrAPIClient {
 
         // Make POST request to API
         try {
-            res = post.execute(context.getString(R.string.post_review_uri), postData).get();
-        } catch(Exception e) {
+            URL url = new URL(context.getString(R.string.post_review_uri));
+            res = post(url, postData);
+        } catch(MalformedURLException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
         // Convert response to JSON array
@@ -123,75 +123,39 @@ public class PlunjrAPIClient {
         return res;
     }
 
-    private class PlunjrPost extends AsyncTask<String, Void, String> {
+    private String post(URL url, String postData) {
+        String res = "[]";
+        try {
+            // Open connection and prepare to send postData
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("charset", "utf-8");
+            connection.setRequestProperty("Content-Length", Integer.toString(postData.length()));
+            connection.setUseCaches(false);
 
-        public String combineParams(String[]... params) {
-            StringBuilder combined = new StringBuilder();
+            // Send postData
+            Writer wr = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()));
+            wr.write(postData);
+            wr.close();
 
-            try {
-                for (String[] p : params) {
-                    combined.append(URLEncoder.encode(p[0], "utf-8"));
-                    combined.append("=");
-                    combined.append(URLEncoder.encode(p[1], "utf-8"));
-                    combined.append("&");
-                }
+            // Receive Response
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder build = new StringBuilder();
+            String line;
 
-                if (combined.length() > 1) {
-                    combined.setLength(combined.length() - 1);
-                }
-            } catch (Exception e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
+            // Read response into buffer
+            while ((line = reader.readLine()) != null) {
+                build.append(line);
             }
-
-            return combined.toString();
+            reader.close();
+            connection.disconnect();
+            res = build.toString();
+        } catch(IOException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
         }
-
-        @Override
-        protected String doInBackground(String... params) {
-            String res = "[]";
-            try {
-                URL url = new URL(params[0]);
-                res = post(url, params[1]);
-            } catch(MalformedURLException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-            }
-            return res;
-        }
-
-        private String post(URL url, String postData) {
-            String res = "[]";
-            try {
-                // Open connection and prepare to send postData
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setDoOutput(true);
-                connection.setDoInput(true);
-                connection.setRequestMethod("POST");
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestProperty("charset", "utf-8");
-                connection.setRequestProperty("Content-Length", Integer.toString(postData.length()));
-                connection.setUseCaches(false);
-
-                // Send postData
-                Writer wr = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()));
-                wr.write(postData);
-                wr.close();
-
-                // Receive Response
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                StringBuilder build = new StringBuilder();
-                String line;
-
-                // Read response into buffer
-                while ((line = reader.readLine()) != null) {
-                    build.append(line);
-                }
-                reader.close();
-                connection.disconnect();
-                res = build.toString();
-            } catch(IOException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-            }
-            return res;
-        }
+        return res;
     }
 }

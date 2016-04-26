@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -17,7 +18,7 @@ public class WriteReviewDialogFragment extends DialogFragment {
 
     // Used to notify parent activity of a positive click
     public interface WriteReviewDialogListener {
-        public void onDialogPositiveClick();
+        void onDialogPositiveClick();
     }
 
     WriteReviewDialogListener mWriteReviewDialogListener;
@@ -52,7 +53,6 @@ public class WriteReviewDialogFragment extends DialogFragment {
                 b.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-
                         String address = ((EditText) dialogView.findViewById(R.id.dialog_address)).getText().toString();
                         String review  = ((EditText) dialogView.findViewById(R.id.dialog_review)).getText().toString();
                         String title   = ((EditText) dialogView.findViewById(R.id.dialog_title)).getText().toString();
@@ -60,8 +60,7 @@ public class WriteReviewDialogFragment extends DialogFragment {
 
                         // Post review if input is valid
                         if(validateInput(dialogView)) {
-                            PlunjrAPIClient client = new PlunjrAPIClient();
-                            client.postReview(getActivity(), address, getString(R.string.default_user), rating, title, review);
+                            new PostReviewTask().execute(address, rating, title, review);
                             mWriteReviewDialogListener.onDialogPositiveClick();
                             d.dismiss();
                         }
@@ -115,5 +114,18 @@ public class WriteReviewDialogFragment extends DialogFragment {
             titleWarning.setVisibility(View.GONE);
         }
         return valid;
+    }
+
+    private class PostReviewTask extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... params) {
+            String address = params[0];
+            String rating  = params[1];
+            String title   = params[2];
+            String review  = params[3];
+            new PlunjrAPIClient().postReview(getActivity(), address, getString(R.string.default_user), rating, title, review);
+            return null;
+        }
     }
 }
