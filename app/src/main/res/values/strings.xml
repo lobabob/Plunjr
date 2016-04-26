@@ -14,7 +14,7 @@
     <string name="dialog_use_location_button">Use My Location</string>
     <string name="dialog_submit">Post Review</string>
     <string name="dialog_cancel">Cancel</string>
-    <string name="dialog_address_warning">Address is required</string>
+    <string name="dialog_address_warning">Invalid address</string>
     <string name="dialog_rating_warning">Rating is required</string>
     <string name="dialog_title_warning">Cannot have title without description</string>
 

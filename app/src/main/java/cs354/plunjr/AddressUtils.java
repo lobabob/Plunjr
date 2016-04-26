@@ -52,4 +52,25 @@ public class AddressUtils {
         }
         return mSb.toString();
     }
+
+    public static boolean isAddressValid(Context context, String addressString) {
+        if(addressString.length() <= 0) {
+            return false;
+        }
+        boolean valid = false;
+
+        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocationName(addressString, 5);
+            for (Address a : addresses) {
+                if (formatAsString(a).equals(addressString)) {
+                    valid = true;
+                    break;
+                }
+            }
+        } catch(IOException e) {
+
+        }
+        return valid;
+    }
 }

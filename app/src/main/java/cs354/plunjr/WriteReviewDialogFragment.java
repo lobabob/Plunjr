@@ -74,7 +74,7 @@ public class WriteReviewDialogFragment extends DialogFragment {
         View titleWarning   = v.findViewById(R.id.dialog_title_warning);
 
         // Validate address
-        if(address.getText().toString().length() <= 0) {
+        if(!AddressUtils.isAddressValid(getActivity(), address.getText().toString())) {
             addressWarning.setVisibility(View.VISIBLE);
             valid = false;
         } else {
