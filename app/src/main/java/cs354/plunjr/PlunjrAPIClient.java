@@ -19,6 +19,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
+
+/**
+ * Used for easily getting data from the Plunjr backend
+ * The methods in this class can NOT be used on the UI thread
+ * It is expected that this class will only be used in the context of an AsyncTask
+ */
 public class PlunjrAPIClient {
 
     private static final String LOG_TAG = "API Client";
@@ -27,8 +33,9 @@ public class PlunjrAPIClient {
         // Make GET request to API
         String res = "";
         try {
-            res = new PlunjrGet().execute(context.getString(R.string.get_restrooms_uri)).get();
-        } catch(Exception e) {
+            URL url = new URL(context.getString(R.string.get_restrooms_uri));
+            res = get(url);
+        } catch(MalformedURLException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
         // Convert response to JSON array
@@ -44,7 +51,8 @@ public class PlunjrAPIClient {
     public JSONArray getReviews(Context context, int restroomID) {
         String res = "";
         try {
-            res = new PlunjrGet().execute(String.format(context.getString(R.string.get_reviews_uri), restroomID)).get();
+            URL url = new URL(String.format(context.getString(R.string.get_reviews_uri), restroomID));
+            res = get(url);
         } catch(Exception e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
@@ -93,41 +101,26 @@ public class PlunjrAPIClient {
         return resObj;
     }
 
-    private class PlunjrGet extends AsyncTask<String, Void, String> {
+    private String get(URL url) {
+        String res = "[]";
+        try {
+            // Open connection and prepare to receive response
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder build = new StringBuilder();
+            String line;
 
-        @Override
-        protected String doInBackground(String... params) {
-            String res = "[]";
-            try {
-                URL url = new URL(params[0]);
-                res = get(url);
-            } catch(MalformedURLException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
+            // Read response into buffer
+            while((line = reader.readLine()) != null) {
+                build.append(line);
             }
-            return res;
+            reader.close();
+            connection.disconnect();
+            res = build.toString();
+        } catch(IOException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
         }
-
-        private String get(URL url) {
-            String res = "[]";
-            try {
-                // Open connection and prepare to receive response
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                StringBuilder build = new StringBuilder();
-                String line;
-
-                // Read response into buffer
-                while((line = reader.readLine()) != null) {
-                    build.append(line);
-                }
-                reader.close();
-                connection.disconnect();
-                res = build.toString();
-            } catch(IOException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-            }
-            return res;
-        }
+        return res;
     }
 
     private class PlunjrPost extends AsyncTask<String, Void, String> {

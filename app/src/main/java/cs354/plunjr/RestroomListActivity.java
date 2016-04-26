@@ -1,9 +1,11 @@
 package cs354.plunjr;
 
+import android.content.Context;
 import android.graphics.Rect;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -18,7 +20,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -39,46 +40,6 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
     private WriteReviewDialogFragment mDialog;
     private GoogleMap mMap;
 
-    private void initRestroomList() {
-        RecyclerView restroomListView = (RecyclerView) findViewById(R.id.restroomList);
-        restroomListView.setHasFixedSize(true);
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-        restroomListView.setLayoutManager(llm);
-        restroomListView.setAdapter(mRestroomListAdapter);
-        loadRestrooms();
-    }
-
-    private void loadRestrooms() {
-        try {
-            mRestroomListAdapter.clear();
-            JSONArray restrooms = new PlunjrAPIClient().getRestrooms(this);
-
-            for(int i = 0; i < restrooms.length(); i++) {
-                JSONObject restroom = restrooms.getJSONObject(i);
-                RestroomListAdapter.RestroomInfo rrInfo = new RestroomListAdapter.RestroomInfo();
-
-                rrInfo.name = restroom.optString("name");
-                rrInfo.address = restroom.optString("address");
-                rrInfo.rating = (float) restroom.optDouble("averageRating");
-                rrInfo.reviewCount = restroom.optInt("reviewCount");
-                rrInfo.id = restroom.optInt("id");
-
-                mRestroomListAdapter.add(rrInfo);
-            }
-            mRestroomListAdapter.notifyDataSetChanged();
-        } catch (JSONException e) {
-            Toast.makeText(this, "JSON exception while populating list", Toast.LENGTH_SHORT).show();
-            Log.e("Restroom List", e.getMessage(), e);
-        }
-    }
-
-    private void refreshRestrooms() {
-        Toast.makeText(getApplicationContext(), "Reloading restrooms...", Toast.LENGTH_SHORT).show();
-        mSwipeRefreshLayout.setRefreshing(true);
-        loadRestrooms();
-        mSwipeRefreshLayout.setRefreshing(false);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,5 +138,55 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
     @Override
     public void onDialogPositiveClick() {
         refreshRestrooms();
+    }
+
+    private void initRestroomList() {
+        RecyclerView restroomListView = (RecyclerView) findViewById(R.id.restroomList);
+        restroomListView.setHasFixedSize(true);
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        restroomListView.setLayoutManager(llm);
+        restroomListView.setAdapter(mRestroomListAdapter);
+        refreshRestrooms();
+    }
+
+    private void refreshRestrooms() {
+        new LoadRestroomsTask().execute(this);
+    }
+
+    /**
+     * Used by the RestroomListActivity to load the restroom list on a separate thread
+     */
+    private class LoadRestroomsTask extends AsyncTask<Context, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Context... params) {
+            try {
+                mRestroomListAdapter.clear();
+                JSONArray restrooms = new PlunjrAPIClient().getRestrooms(params[0]);
+
+                for(int i = 0; i < restrooms.length(); i++) {
+                    JSONObject restroom = restrooms.getJSONObject(i);
+                    RestroomListAdapter.RestroomInfo rrInfo = new RestroomListAdapter.RestroomInfo();
+
+                    rrInfo.name = restroom.optString("name");
+                    rrInfo.address = restroom.optString("address");
+                    rrInfo.rating = (float) restroom.optDouble("averageRating");
+                    rrInfo.reviewCount = restroom.optInt("reviewCount");
+                    rrInfo.id = restroom.optInt("id");
+
+                    mRestroomListAdapter.add(rrInfo);
+                }
+            } catch (JSONException e) {
+                Log.e("Restroom List", e.getMessage(), e);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            mSwipeRefreshLayout.setRefreshing(false);
+            mRestroomListAdapter.notifyDataSetChanged();
+        }
     }
 }

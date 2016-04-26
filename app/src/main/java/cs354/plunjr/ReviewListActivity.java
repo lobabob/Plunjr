@@ -1,5 +1,6 @@
 package cs354.plunjr;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -31,26 +32,24 @@ public class ReviewListActivity extends AppCompatActivity {
     private DateFormat formatDatePattern;
     private List<Map<String, String>> reviewList = new ArrayList<>();
 
-    private void populateReviewList(int restroomID) {
-        try {
-            //JSONArray reviews = new JSONArray(getResources().getString(R.string.debug_review_json));
-            JSONArray reviews = new PlunjrAPIClient().getReviews(this, restroomID);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_review_list);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-            // Create a hash map for each row's data (one hash map per row)
-            for(int i = 0; i < reviews.length(); i++) {
-                JSONObject review = reviews.getJSONObject(i);
-                HashMap<String, String> rowData = new HashMap<>();
+        parseDatePattern = new SimpleDateFormat(
+                getResources().getString(R.string.review_parse_date), Locale.ROOT);
+        formatDatePattern = new SimpleDateFormat(
+                getResources().getString(R.string.review_format_date), Locale.ROOT);
 
-                Iterator<String> keys = review.keys();
-                while(keys.hasNext()) {
-                    String key = keys.next();
-                    rowData.put(key, review.optString(key));
-                }
-                reviewList.add(rowData);
-            }
-        } catch(JSONException e) {
-            Log.e("Review List", e.getMessage(), e);
-        }
+        Bundle extras = getIntent().getExtras();
+        int restroomID = extras.getInt("restroomID");
+        setTitle(extras.getString("restroomName"));
+
+        new LoadReviewsTask().execute(restroomID);
     }
 
     private void initReviewListAdapter() {
@@ -63,27 +62,6 @@ public class ReviewListActivity extends AppCompatActivity {
         SimpleAdapter reviewListViewAdapter = new SimpleAdapter(this, reviewList, R.layout.review_item, from, to);
         reviewListViewAdapter.setViewBinder(new ReviewListViewBinder());
         reviewListView.setAdapter(reviewListViewAdapter);
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_review_list);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        parseDatePattern = new SimpleDateFormat(
-            getResources().getString(R.string.review_parse_date), Locale.ROOT);
-        formatDatePattern = new SimpleDateFormat(
-            getResources().getString(R.string.review_format_date), Locale.ROOT);
-
-        Bundle extras = getIntent().getExtras();
-        int restroomID = extras.getInt("restroomID");
-        setTitle(extras.getString("restroomName"));
-
-        populateReviewList(restroomID);
-        initReviewListAdapter();
     }
 
     private class ReviewListViewBinder implements SimpleAdapter.ViewBinder {
@@ -111,6 +89,38 @@ public class ReviewListActivity extends AppCompatActivity {
                 text.setText(textRepresentation);
             }
             return true;
+        }
+    }
+
+    private class LoadReviewsTask extends AsyncTask<Integer, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Integer... params) {
+            try {
+                //JSONArray reviews = new JSONArray(getResources().getString(R.string.debug_review_json));
+                JSONArray reviews = new PlunjrAPIClient().getReviews(getApplicationContext(), params[0]);
+
+                // Create a hash map for each row's data (one hash map per row)
+                for(int i = 0; i < reviews.length(); i++) {
+                    JSONObject review = reviews.getJSONObject(i);
+                    HashMap<String, String> rowData = new HashMap<>();
+
+                    Iterator<String> keys = review.keys();
+                    while(keys.hasNext()) {
+                        String key = keys.next();
+                        rowData.put(key, review.optString(key));
+                    }
+                    reviewList.add(rowData);
+                }
+            } catch(JSONException e) {
+                Log.e("Review List", e.getMessage(), e);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            initReviewListAdapter();
         }
     }
 }
