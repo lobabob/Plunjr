@@ -59,7 +59,9 @@
             android:id="@+id/restroomList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fitsSystemWindows="true"/>
+            android:fitsSystemWindows="true"
+            android:scrollbars="vertical"
+            android:background="@color/colorWhite"/>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

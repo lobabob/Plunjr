@@ -46,7 +46,6 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         restroomListView.setLayoutManager(llm);
         restroomListView.setAdapter(mRestroomListAdapter);
-        restroomListView.addItemDecoration(new RestroomListAdapter.Divider(this, 1));
         loadRestrooms();
     }
 

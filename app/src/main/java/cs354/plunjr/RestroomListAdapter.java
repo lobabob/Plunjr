@@ -95,22 +95,4 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
         protected float rating;
         protected int id;
     }
-
-    public static class Divider extends RecyclerView.ItemDecoration {
-
-        private final int mHeight;
-
-        public Divider(Context context, int height) {
-            // Convert height value from dp to px
-            height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, height, context.getResources().getDisplayMetrics());
-            this.mHeight = height;
-        }
-
-        @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
-                                   RecyclerView.State state) {
-            outRect.bottom = mHeight;
-        }
-
-    }
 }
