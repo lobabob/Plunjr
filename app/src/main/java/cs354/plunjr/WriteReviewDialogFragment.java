@@ -6,7 +6,6 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -55,12 +54,11 @@ public class WriteReviewDialogFragment extends DialogFragment {
         userLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText addressField = (EditText) dialogView.findViewById(R.id.dialog_address);
-                addressField.setText(AddressUtils.getUserAddress(getActivity()));
+                AddressAutoCompleteTextView addressView = (AddressAutoCompleteTextView) dialogView.findViewById(R.id.dialog_address);
+                addressView.setDropdownContents(AddressUtils.getUserAddresses(getActivity()));
+                addressView.showDropDown();
             }
         });
-        AutoCompleteTextView addressView = (AutoCompleteTextView) dialogView.findViewById(R.id.dialog_address);
-        addressView.setAdapter(new AddressUtils.AutoCompleteAdapter(getActivity()));
         return d;
     }
 

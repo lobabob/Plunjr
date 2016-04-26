@@ -20,14 +20,16 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <AutoCompleteTextView
+        <cs354.plunjr.AddressAutoCompleteTextView
+            xmlns:plunjr="http://schemas.android.com/apk/res/cs354.plunjr"
             android:id="@+id/dialog_address"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:inputType="textPostalAddress"
-            android:completionThreshold="5"
-            android:hint="@string/dialog_address_hint"/>
+            android:completionThreshold="1"
+            android:hint="@string/dialog_address_hint"
+            plunjr:max_suggestions="3"/>
 
         <!-- Use user location button -->
         <ImageButton
