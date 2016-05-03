@@ -24,6 +24,7 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
 
     public RestroomListAdapter(List<RestroomInfo> restrooms) {
         this.restrooms = restrooms;
+        setHasStableIds(true);
     }
 
     @Override
@@ -69,6 +70,11 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
                 context.startActivity(mapIntent);
             }
         });
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return restrooms.get(position).id;
     }
 
     @Override
