@@ -21,21 +21,29 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RestroomListActivity extends AppCompatActivity implements OnMapReadyCallback, WriteReviewDialogFragment.WriteReviewDialogListener {
 
     private static final double METERS_PER_MILE = 1609.344;
+    private static AtomicInteger mAsyncTaskCounter = new AtomicInteger(2);
+    private List<LatLng> mRestroomLatLngs = new ArrayList<>();
 
     private RestroomListAdapter mRestroomListAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -105,6 +113,9 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setAllGesturesEnabled(false);
         centerMapCamera();
+        if(mAsyncTaskCounter.decrementAndGet() <= 0) {
+            placeMapPins();
+        }
     }
 
     @Override
@@ -154,6 +165,22 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         }
     }
 
+    private void placeMapPins() {
+        if(mRestroomLatLngs.size() > 0) {
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            for (LatLng latLng : mRestroomLatLngs) {
+                MarkerOptions marker = new MarkerOptions()
+                        .position(latLng);
+                        //.icon(BitmapDescriptorFactory.fromResource(R.drawable.plunger))
+                        //.title("test");
+                mMap.addMarker(marker);
+                builder.include(latLng);
+            }
+            CameraUpdate update = CameraUpdateFactory.newLatLngBounds(builder.build(), 10);
+            mMap.animateCamera(update);
+        }
+    }
+
     private void initRestroomList() {
         RecyclerView restroomListView = (RecyclerView) findViewById(R.id.restroomList);
         restroomListView.setHasFixedSize(true);
@@ -187,8 +214,10 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
 
                         // Calculate restroom distance from user
                         LatLng myPos = getUserLatLng();
+                        LatLng rrPos = new LatLng(restroom.optDouble("lat"), restroom.optDouble("lng"));
                         float res[] = {0};
-                        Location.distanceBetween(restroom.optDouble("lat"), restroom.optDouble("lng"), myPos.latitude, myPos.longitude, res);
+                        Location.distanceBetween(rrPos.latitude, rrPos.longitude, myPos.latitude, myPos.longitude, res);
+                        mRestroomLatLngs.add(rrPos);
 
                         rrInfo.distance = String.format("%.1fmi", res[0] / METERS_PER_MILE);
                         rrInfo.name = restroom.optString("name");
@@ -210,6 +239,9 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         protected void onPostExecute(Void result) {
             mSwipeRefreshLayout.setRefreshing(false);
             mRestroomListAdapter.notifyDataSetChanged();
+            if(mAsyncTaskCounter.decrementAndGet() <= 0) {
+                placeMapPins();
+            }
         }
     }
 }

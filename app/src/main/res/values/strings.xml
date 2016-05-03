@@ -22,7 +22,7 @@
     <string name="menu_write_review">Write a Review</string>
 
     <!-- API endpoints -->
-    <string name="get_restrooms_uri" formatted="false">http://104.130.132.153/api/restrooms?lat=%f&amp;lng=%f</string>
+    <string name="get_restrooms_uri" formatted="false">http://104.130.132.153/api/restrooms?lat=%f&amp;lng=%f&amp;radius=1600</string>
     <string name="get_reviews_uri">http://104.130.132.153/api/restrooms/%d/reviews</string>
     <string name="post_review_uri">http://104.130.132.153/api/reviews</string>
 
