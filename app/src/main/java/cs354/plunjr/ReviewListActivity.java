@@ -2,6 +2,7 @@ package cs354.plunjr;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -31,6 +32,7 @@ public class ReviewListActivity extends AppCompatActivity {
     private DateFormat parseDatePattern;
     private DateFormat formatDatePattern;
     private List<Map<String, String>> reviewList = new ArrayList<>();
+    private WriteReviewDialogFragment mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +51,16 @@ public class ReviewListActivity extends AppCompatActivity {
         int restroomID = extras.getInt("restroomID");
         setTitle(extras.getString("restroomName"));
 
+        mDialog = new WriteReviewDialogFragment();
         new LoadReviewsTask().execute(restroomID);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mDialog.show(getFragmentManager(), "dialog");
+            }
+        });
     }
 
     private void initReviewListAdapter() {
@@ -97,7 +108,7 @@ public class ReviewListActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Integer... params) {
             try {
-                //JSONArray reviews = new JSONArray(getResources().getString(R.string.debug_review_json));
+//                JSONArray reviews = new JSONArray(getResources().getString(R.string.debug_review_json));
                 JSONArray reviews = new PlunjrAPIClient().getReviews(getApplicationContext(), params[0]);
 
                 // Create a hash map for each row's data (one hash map per row)

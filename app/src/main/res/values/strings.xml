@@ -7,13 +7,13 @@
     <string name="default_user">Anonymous</string>
 
     <!-- For "post review" dialog -->
-    <string name="dialog_title">Rate a Restroom</string>
+    <string name="dialog_title">Restroom Review</string>
     <string name="dialog_address_hint">Restroom Address</string>
     <string name="dialog_title_hint">Title (Optional)</string>
     <string name="dialog_review_hint">Description (Optional)</string>
     <string name="dialog_use_location_button">Use My Location</string>
     <string name="dialog_submit">Post Review</string>
-    <string name="dialog_cancel">Cancel</string>
+    <!--<string name="dialog_cancel">Cancel</string>-->
     <string name="dialog_address_warning">Invalid address</string>
     <string name="dialog_rating_warning">Rating is required</string>
     <string name="dialog_title_warning">Cannot have title without description</string>
@@ -69,7 +69,43 @@
                 \"date\":\"2016-11-25\",
                 \"rating\":\"3.5\",
                 \"description\":\"Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. \"
+            },
+            {
+                \"user\":\"DaWorstReviewer\",
+                \"title\":\"Super crazy ultra fake title\",
+                \"date\":\"2015-03-04\",
+                \"rating\":\"3.5\",
+                \"description\":\"Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. \"
+            },
+            {
+                \"user\":\"DaWorstReviewer\",
+                \"title\":\"Super crazy ultra fake title\",
+                \"date\":\"2015-03-04\",
+                \"rating\":\"3.5\",
+                \"description\":\"Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. \"
+            },
+            {
+                \"user\":\"DaWorstReviewer\",
+                \"title\":\"Super crazy ultra fake title\",
+                \"date\":\"2015-03-04\",
+                \"rating\":\"3.5\",
+                \"description\":\"Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. \"
+            },
+            {
+                \"user\":\"DaWorstReviewer\",
+                \"title\":\"Super crazy ultra fake title\",
+                \"date\":\"2015-03-04\",
+                \"rating\":\"3.5\",
+                \"description\":\"Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. \"
+            },
+            {
+                \"user\":\"DaWorstReviewer\",
+                \"title\":\"Super crazy ultra fake title\",
+                \"date\":\"2015-03-04\",
+                \"rating\":\"3.5\",
+                \"description\":\"Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. Review text. \"
             }
         ]"
     </string>
+    <string name="title_activity_test">test</string>
 </resources>

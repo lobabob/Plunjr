@@ -1,7 +1,6 @@
 package cs354.plunjr;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -17,7 +16,6 @@ import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 
 
 /**

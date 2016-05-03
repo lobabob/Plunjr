@@ -41,7 +41,7 @@ public class WriteReviewDialogFragment extends DialogFragment {
 
         final AlertDialog d = builder.setTitle(R.string.dialog_title)
                 .setPositiveButton(R.string.dialog_submit, null)
-                .setNegativeButton(R.string.dialog_cancel, null)
+//                .setNegativeButton(R.string.dialog_cancel, null)
                 .setView(dialogView)
                 .create();
 
