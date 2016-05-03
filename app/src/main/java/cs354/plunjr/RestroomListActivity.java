@@ -206,7 +206,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
                         Location.distanceBetween(rrPos.latitude, rrPos.longitude, myPos.latitude, myPos.longitude, res);
 
                         rrInfo.latLng = rrPos;
-                        rrInfo.distance = String.format(Locale.US, "%.1f mi", res[0] / METERS_PER_MILE);
+                        rrInfo.distance = res[0] / METERS_PER_MILE;
                         rrInfo.name = restroom.optString("name");
                         rrInfo.address = restroom.optString("address");
                         rrInfo.rating = (float) restroom.optDouble("averageRating");
@@ -225,6 +225,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         @Override
         protected void onPostExecute(Void result) {
             mSwipeRefreshLayout.setRefreshing(false);
+            mRestroomListAdapter.sortByCloseness();
             mRestroomListAdapter.notifyDataSetChanged();
             if(mAsyncTaskCounter.decrementAndGet() <= 0) {
                 placeMapPins();

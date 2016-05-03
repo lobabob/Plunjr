@@ -13,7 +13,10 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapter.RestroomViewHolder> {
 
@@ -43,7 +46,7 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
         rrHolder.reviewCount.setText(
                 String.format(rrHolder.reviewCount.getContext().getString(R.string.review_count_format), rr.reviewCount)
         );
-        rrHolder.distance.setText(rr.distance);
+        rrHolder.distance.setText(String.format(Locale.US, "%.1f mi", rr.distance));
 
         // Set holder on click listener
         rrHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -71,6 +74,16 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
     @Override
     public int getItemCount() {
         return restrooms.size();
+    }
+
+    public void sortByRating() {
+        Collections.sort(restrooms, new RatingComparator());
+        notifyDataSetChanged();
+    }
+
+    public void sortByCloseness() {
+        Collections.sort(restrooms, new ClosenessComparator());
+        notifyDataSetChanged();
     }
 
     public void clear() {
@@ -108,10 +121,40 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
     public static class RestroomInfo {
         protected String name;
         protected String address;
-        protected String distance;
+        protected double distance;
         protected int reviewCount;
         protected float rating;
         protected LatLng latLng;
         protected int id;
+    }
+
+    /**
+     * Sorts a Collection of RestroomInfo by ascending distance from user
+     */
+    private class ClosenessComparator implements Comparator<RestroomInfo> {
+
+        @Override
+        public int compare(RestroomInfo lhs, RestroomInfo rhs) {
+            if(lhs.distance > rhs.distance) {
+                return 1;
+            } else {
+                return -1;
+            }
+        }
+    }
+
+    /**
+     * Sorts a Collection of RestroomInfo by descending rating
+     */
+    private class RatingComparator implements Comparator<RestroomInfo> {
+
+        @Override
+        public int compare(RestroomInfo lhs, RestroomInfo rhs) {
+            if(lhs.rating < rhs.rating) {
+                return 1;
+            } else {
+                return -1;
+            }
+        }
     }
 }
