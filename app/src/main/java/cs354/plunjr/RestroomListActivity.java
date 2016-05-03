@@ -102,17 +102,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setAllGesturesEnabled(false);
-
-        // Get user location
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        String provider = locationManager.getBestProvider(new Criteria(), true);
-        Location location = locationManager.getLastKnownLocation(provider);
-
-        // Zoom in on user's current location
-        if(location != null) {
-            LatLng myPosition = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 15.5f));
-        }
+        centerMapCamera();
     }
 
     @Override
@@ -140,6 +130,28 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         refreshRestrooms();
     }
 
+    private LatLng getUserLatLng() {
+        LatLng myPosition = null;
+
+        // Get user location
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        String provider = locationManager.getBestProvider(new Criteria(), true);
+        Location location = locationManager.getLastKnownLocation(provider);
+
+        // Zoom in on user's current location
+        if(location != null) {
+            myPosition = new LatLng(location.getLatitude(), location.getLongitude());
+        }
+        return myPosition;
+    }
+
+    private void centerMapCamera() {
+        LatLng myPosition = getUserLatLng();
+        if(myPosition != null && mMap != null) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 15.5f));
+        }
+    }
+
     private void initRestroomList() {
         RecyclerView restroomListView = (RecyclerView) findViewById(R.id.restroomList);
         restroomListView.setHasFixedSize(true);
@@ -163,19 +175,22 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         protected Void doInBackground(Context... params) {
             try {
                 mRestroomListAdapter.clear();
-                JSONArray restrooms = new PlunjrAPIClient().getRestrooms(params[0]);
+                LatLng myPosition = getUserLatLng();
+                if(myPosition != null) {
+                    JSONArray restrooms = new PlunjrAPIClient().getRestrooms(params[0], myPosition.latitude, myPosition.longitude);
 
-                for(int i = 0; i < restrooms.length(); i++) {
-                    JSONObject restroom = restrooms.getJSONObject(i);
-                    RestroomListAdapter.RestroomInfo rrInfo = new RestroomListAdapter.RestroomInfo();
+                    for (int i = 0; i < restrooms.length(); i++) {
+                        JSONObject restroom = restrooms.getJSONObject(i);
+                        RestroomListAdapter.RestroomInfo rrInfo = new RestroomListAdapter.RestroomInfo();
 
-                    rrInfo.name = restroom.optString("name");
-                    rrInfo.address = restroom.optString("address");
-                    rrInfo.rating = (float) restroom.optDouble("averageRating");
-                    rrInfo.reviewCount = restroom.optInt("reviewCount");
-                    rrInfo.id = restroom.optInt("id");
+                        rrInfo.name = restroom.optString("name");
+                        rrInfo.address = restroom.optString("address");
+                        rrInfo.rating = (float) restroom.optDouble("averageRating");
+                        rrInfo.reviewCount = restroom.optInt("reviewCount");
+                        rrInfo.id = restroom.optInt("id");
 
-                    mRestroomListAdapter.add(rrInfo);
+                        mRestroomListAdapter.add(rrInfo);
+                    }
                 }
             } catch (JSONException e) {
                 Log.e("Restroom List", e.getMessage(), e);

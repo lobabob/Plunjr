@@ -29,11 +29,11 @@ public class PlunjrAPIClient {
 
     private static final String LOG_TAG = "API Client";
 
-    public JSONArray getRestrooms(Context context) {
+    public JSONArray getRestrooms(Context context, double lat, double lng) {
         // Make GET request to API
         String res = "";
         try {
-            URL url = new URL(context.getString(R.string.get_restrooms_uri));
+            URL url = new URL(String.format(context.getString(R.string.get_restrooms_uri), lat, lng));
             res = get(url);
         } catch(MalformedURLException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
