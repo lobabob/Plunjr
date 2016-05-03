@@ -1,10 +1,13 @@
 package cs354.plunjr;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
@@ -30,7 +33,7 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
     }
 
     @Override
-    public void onBindViewHolder(RestroomViewHolder rrHolder, int position) {
+    public void onBindViewHolder(final RestroomViewHolder rrHolder, int position) {
         final RestroomInfo rr = restrooms.get(position);
 
         // Bind data to view
@@ -50,6 +53,17 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
                 intent.putExtra("restroomID", rr.id);
                 intent.putExtra("restroomName", rr.name);
                 view.getContext().startActivity(intent);
+            }
+        });
+        // Set directions button on click listener
+        rrHolder.directionsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context context = rrHolder.itemView.getContext();
+                Uri gmmIntentUri = Uri.parse(String.format(context.getString(R.string.google_maps_directions_uri), rr.address));
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                context.startActivity(mapIntent);
             }
         });
     }
@@ -78,6 +92,7 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
         protected TextView distance;
         protected TextView reviewCount;
         protected RatingBar rating;
+        protected ImageButton directionsButton;
 
         public RestroomViewHolder(View v) {
             super(v);
@@ -86,6 +101,7 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
             distance = (TextView) v.findViewById(R.id.listRowDistance);
             reviewCount = (TextView) v.findViewById(R.id.listRowReviewCount);
             rating = (RatingBar) v.findViewById(R.id.listRowRatingBar);
+            directionsButton = (ImageButton) v.findViewById(R.id.listRowDirectionsButton);
         }
     }
 

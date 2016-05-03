@@ -25,6 +25,7 @@
     <string name="get_restrooms_uri" formatted="false">http://104.130.132.153/api/restrooms?lat=%f&amp;lng=%f&amp;radius=1600</string>
     <string name="get_reviews_uri">http://104.130.132.153/api/restrooms/%d/reviews</string>
     <string name="post_review_uri">http://104.130.132.153/api/reviews</string>
+    <string name="google_maps_directions_uri">google.navigation:q=%s&amp;mode=w</string>
 
     <!-- TODO: Remove when not needed -->
     <string name="debug_json">
