@@ -65,7 +65,7 @@ public class PlunjrAPIClient {
     }
 
     public JSONObject postReview(Context context, String address, String user, String rating,
-                                String title, String description) {
+                                String title, String description, String name, String lat, String lng) {
         String res = "";
         JSONObject resObj = new JSONObject();
 
@@ -77,7 +77,9 @@ public class PlunjrAPIClient {
             obj.put("rating", rating);
             obj.put("title", title);
             obj.put("description", description);
-            obj.put("name", "");
+            obj.put("name", name);
+            obj.put("lat", Float.parseFloat(lat));
+            obj.put("lng", Float.parseFloat(lng));
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }

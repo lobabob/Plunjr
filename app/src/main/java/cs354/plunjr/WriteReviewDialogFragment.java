@@ -13,6 +13,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RatingBar;
 
+import com.google.android.gms.maps.model.LatLng;
+
 
 public class WriteReviewDialogFragment extends DialogFragment {
 
@@ -58,9 +60,16 @@ public class WriteReviewDialogFragment extends DialogFragment {
                         String title   = ((EditText) dialogView.findViewById(R.id.dialog_title)).getText().toString();
                         String rating  = String.valueOf(((RatingBar) dialogView.findViewById(R.id.dialog_rating)).getRating());
 
+                        // Get lat and long of restroom as a string
+                        LatLng rrLatLng = AddressUtils.getAddressLatLng(getActivity(), address);
+                        String lat = String.valueOf(rrLatLng.latitude);
+                        String lng = String.valueOf(rrLatLng.longitude);
+
+                        String name = AddressUtils.getAddressFeatureName(getActivity(), address);
+
                         // Post review if input is valid
                         if(validateInput(dialogView)) {
-                            new PostReviewTask().execute(address, rating, title, review);
+                            new PostReviewTask().execute(address, rating, title, review, name, lat, lng);
                             mWriteReviewDialogListener.onDialogPositiveClick();
                             d.dismiss();
                         }
@@ -124,7 +133,10 @@ public class WriteReviewDialogFragment extends DialogFragment {
             String rating  = params[1];
             String title   = params[2];
             String review  = params[3];
-            new PlunjrAPIClient().postReview(getActivity(), address, getString(R.string.default_user), rating, title, review);
+            String name    = params[4];
+            String lat     = params[5];
+            String lng     = params[6];
+            new PlunjrAPIClient().postReview(getActivity(), address, getString(R.string.default_user), rating, title, review, name, lat, lng);
             return null;
         }
     }
