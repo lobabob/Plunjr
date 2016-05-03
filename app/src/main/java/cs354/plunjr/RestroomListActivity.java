@@ -43,7 +43,6 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
 
     private static final double METERS_PER_MILE = 1609.344;
     private static AtomicInteger mAsyncTaskCounter = new AtomicInteger(2);
-    private List<LatLng> mRestroomLatLngs = new ArrayList<>();
 
     private RestroomListAdapter mRestroomListAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -166,15 +165,16 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
     }
 
     private void placeMapPins() {
-        if(mRestroomLatLngs.size() > 0) {
+        if(mRestroomListAdapter.getItemCount() > 0) {
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
-            for (LatLng latLng : mRestroomLatLngs) {
+            for(int i = 0; i < mRestroomListAdapter.getItemCount(); i++) {
+                LatLng rrPos = mRestroomListAdapter.get(i).latLng;
                 MarkerOptions marker = new MarkerOptions()
-                        .position(latLng);
+                        .position(rrPos);
                         //.icon(BitmapDescriptorFactory.fromResource(R.drawable.plunger))
                         //.title("test");
                 mMap.addMarker(marker);
-                builder.include(latLng);
+                builder.include(rrPos);
             }
             CameraUpdate update = CameraUpdateFactory.newLatLngBounds(builder.build(), 10);
             mMap.animateCamera(update);
@@ -217,8 +217,8 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
                         LatLng rrPos = new LatLng(restroom.optDouble("lat"), restroom.optDouble("lng"));
                         float res[] = {0};
                         Location.distanceBetween(rrPos.latitude, rrPos.longitude, myPos.latitude, myPos.longitude, res);
-                        mRestroomLatLngs.add(rrPos);
 
+                        rrInfo.latLng = rrPos;
                         rrInfo.distance = String.format("%.1fmi", res[0] / METERS_PER_MILE);
                         rrInfo.name = restroom.optString("name");
                         rrInfo.address = restroom.optString("address");

@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.List;
 
 public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapter.RestroomViewHolder> {
@@ -65,6 +67,10 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
         return restrooms.add(rr);
     }
 
+    public RestroomInfo get(int idx) {
+        return restrooms.get(idx);
+    }
+
     public static class RestroomViewHolder extends RecyclerView.ViewHolder {
 
         protected TextView name;
@@ -89,6 +95,7 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
         protected String distance;
         protected int reviewCount;
         protected float rating;
+        protected LatLng latLng;
         protected int id;
     }
 }
