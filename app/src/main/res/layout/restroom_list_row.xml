@@ -14,22 +14,13 @@
         android:src="@drawable/placeholder"
         android:scaleType="fitXY"/>
 
-    <!-- Distance -->
-    <TextView
-        android:id="@+id/listRowDistance"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:gravity="right"
-        android:text="Dist"/>
-
     <!-- Restroom Title -->
     <TextView
         android:id="@+id/listRowTitle"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/listRowImage"
-        android:layout_toLeftOf="@id/listRowDistance"
+        android:layout_toEndOf="@id/listRowImage"
         android:textStyle="bold"
         android:maxLines="1"
         android:ellipsize="end"
@@ -68,13 +59,24 @@
         android:secondaryProgressTint="@android:color/transparent"
         android:rating="4"/>
 
+    <!-- Distance -->
+    <TextView
+        android:id="@+id/listRowDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:gravity="right"
+        android:text="Dist"/>
+
     <!-- Get Directions -->
     <ImageButton
         android:id="@+id/listRowDirectionsButton"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@id/listRowDistance"
+        android:gravity="bottom"
         android:src="@drawable/ic_directions"
         android:background="@null"
         android:scaleType="fitXY"/>
