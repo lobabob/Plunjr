@@ -38,8 +38,7 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
         rrHolder.reviewCount.setText(
                 String.format(rrHolder.reviewCount.getContext().getString(R.string.review_count_format), rr.reviewCount)
         );
-        // TODO: calculate distance and bind it here
-        rrHolder.distance.setText("DIST");
+        rrHolder.distance.setText(rr.distance);
 
         // Set holder on click listener
         rrHolder.itemView.setOnClickListener(new View.OnClickListener() {

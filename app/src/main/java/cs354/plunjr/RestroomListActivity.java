@@ -35,6 +35,8 @@ import java.util.ArrayList;
 
 public class RestroomListActivity extends AppCompatActivity implements OnMapReadyCallback, WriteReviewDialogFragment.WriteReviewDialogListener {
 
+    private static final double METERS_PER_MILE = 1609.344;
+
     private RestroomListAdapter mRestroomListAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private WriteReviewDialogFragment mDialog;
@@ -183,6 +185,12 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
                         JSONObject restroom = restrooms.getJSONObject(i);
                         RestroomListAdapter.RestroomInfo rrInfo = new RestroomListAdapter.RestroomInfo();
 
+                        // Calculate restroom distance from user
+                        LatLng myPos = getUserLatLng();
+                        float res[] = {0};
+                        Location.distanceBetween(restroom.optDouble("lat"), restroom.optDouble("lng"), myPos.latitude, myPos.longitude, res);
+
+                        rrInfo.distance = String.format("%.1fmi", res[0] / METERS_PER_MILE);
                         rrInfo.name = restroom.optString("name");
                         rrInfo.address = restroom.optString("address");
                         rrInfo.rating = (float) restroom.optDouble("averageRating");
