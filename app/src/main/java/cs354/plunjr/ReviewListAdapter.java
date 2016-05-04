@@ -21,6 +21,16 @@ public class ReviewListAdapter extends RecyclerView.Adapter<ReviewListAdapter.Re
         return reviews.add(r);
     }
 
+    public void setTextAndVisibility(TextView v, String text) {
+        if (text.equals("")) {
+            v.setVisibility(View.GONE);
+        } else {
+            v.setVisibility(View.VISIBLE);
+        }
+
+        v.setText(text);
+    }
+
     @Override
     public long getItemId(int position) {
         return reviews.get(position).id;
@@ -39,11 +49,11 @@ public class ReviewListAdapter extends RecyclerView.Adapter<ReviewListAdapter.Re
     public void onBindViewHolder(ReviewViewHolder holder, int position) {
         final ReviewInfo review = reviews.get(position);
 
-        holder.user.setText(review.user);
-        holder.date.setText(review.date);
+        setTextAndVisibility(holder.user, review.user);
+        setTextAndVisibility(holder.date, review.date);
+        setTextAndVisibility(holder.title, review.title);
+        setTextAndVisibility(holder.description, review.description);
         holder.rating.setRating(review.rating);
-        holder.title.setText(review.title);
-        holder.description.setText(review.description);
     }
 
     @Override
