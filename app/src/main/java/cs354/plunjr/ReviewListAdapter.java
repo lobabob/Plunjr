@@ -1,23 +1,44 @@
 package cs354.plunjr;
 
+import android.app.Activity;
+import android.content.Context;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RatingBar;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.RatingBar;
 
 import java.util.List;
 
-public class ReviewListAdapter extends RecyclerView.Adapter<ReviewListAdapter.ReviewViewHolder> {
-    private List<ReviewInfo> reviews;
+public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    public ReviewListAdapter(List<ReviewListAdapter.ReviewInfo> reviews) {
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_ITEM = 1;
+    private WriteReviewDialogFragment mDialog;
+
+    private List<ReviewItem> reviews;
+    private final double lat;
+    private final double lng;
+    private final Activity context;
+
+    public ReviewListAdapter(Activity context, double lat, double lng, List<ReviewListAdapter.ReviewItem> reviews) {
+        this(context, lat, lng, reviews, new ReviewHeader());
+    }
+
+    public ReviewListAdapter(Activity context, double lat, double lng, List<ReviewListAdapter.ReviewItem> reviews, ReviewHeader header) {
+        reviews.add(0, header);
+        this.context = context;
         this.reviews = reviews;
+        this.lat = lat;
+        this.lng = lng;
+        mDialog = new WriteReviewDialogFragment();
         setHasStableIds(true);
     }
 
-    public boolean add(ReviewInfo r) {
+    public boolean add(ReviewItem r) {
         return reviews.add(r);
     }
 
@@ -37,23 +58,54 @@ public class ReviewListAdapter extends RecyclerView.Adapter<ReviewListAdapter.Re
     }
 
     @Override
-    public ReviewViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View restroomView = LayoutInflater
-            .from(parent.getContext())
-            .inflate(R.layout.review_item, parent, false);
-
-        return new ReviewViewHolder(restroomView);
+    public int getItemViewType(int position) {
+        if (position == 0) {
+            return TYPE_HEADER;
+        }
+        return TYPE_ITEM;
     }
 
     @Override
-    public void onBindViewHolder(ReviewViewHolder holder, int position) {
-        final ReviewInfo review = reviews.get(position);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
-        setTextAndVisibility(holder.user, review.user);
-        setTextAndVisibility(holder.date, review.date);
-        setTextAndVisibility(holder.title, review.title);
-        setTextAndVisibility(holder.description, review.description);
-        holder.rating.setRating(review.rating);
+        if (viewType == TYPE_ITEM) {
+            return new ReviewItemViewHolder(inflater.inflate(R.layout.review_item, parent, false));
+        }
+
+        return new ReviewHeaderViewHolder(inflater.inflate(R.layout.review_header, parent, false));
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof ReviewItemViewHolder) {
+            ReviewItemViewHolder item = (ReviewItemViewHolder) holder;
+            final ReviewInfo review = (ReviewInfo) reviews.get(position);
+
+            setTextAndVisibility(item.user, review.user);
+            setTextAndVisibility(item.date, review.date);
+            setTextAndVisibility(item.title, review.title);
+            setTextAndVisibility(item.description, review.description);
+            item.rating.setRating(review.rating);
+        } else if (holder instanceof ReviewHeaderViewHolder) {
+            ReviewHeaderViewHolder item = (ReviewHeaderViewHolder) holder;
+            final ReviewHeader header = (ReviewHeader) reviews.get(position);
+
+            item.rb.setOnRatingChangeListener(new com.whinc.widget.ratingbar.RatingBar.OnRatingChangeListener() {
+                @Override
+                public void onChange(com.whinc.widget.ratingbar.RatingBar ratingBar, int preCount, int curCount) {
+                    if (curCount > 0) {
+                        Bundle args = new Bundle();
+                        args.putInt("rating", curCount);
+                        args.putDouble("lat", lat);
+                        args.putDouble("lng", lng);
+
+                        mDialog.setArguments(args);
+                        mDialog.show(context.getFragmentManager(), "dialog");
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -61,7 +113,20 @@ public class ReviewListAdapter extends RecyclerView.Adapter<ReviewListAdapter.Re
         return reviews.size();
     }
 
-    public static class ReviewViewHolder extends RecyclerView.ViewHolder {
+    public static class ReviewHeaderViewHolder extends RecyclerView.ViewHolder {
+
+        protected LinearLayout header;
+        protected com.whinc.widget.ratingbar.RatingBar rb;
+
+        public ReviewHeaderViewHolder(View v) {
+            super(v);
+            this.header = (LinearLayout) v.findViewById(R.id.reviewListHeader);
+            this.rb = (com.whinc.widget.ratingbar.RatingBar)
+                    header.findViewById(R.id.newRating);
+        }
+    }
+
+    public static class ReviewItemViewHolder extends RecyclerView.ViewHolder {
 
         protected TextView user;
         protected TextView date;
@@ -69,7 +134,7 @@ public class ReviewListAdapter extends RecyclerView.Adapter<ReviewListAdapter.Re
         protected TextView title;
         protected TextView description;
 
-        public ReviewViewHolder(View v) {
+        public ReviewItemViewHolder(View v) {
             super(v);
             user = (TextView) v.findViewById(R.id.reviewerName);
             date = (TextView) v.findViewById(R.id.reviewDate);
@@ -79,12 +144,19 @@ public class ReviewListAdapter extends RecyclerView.Adapter<ReviewListAdapter.Re
         }
     }
 
-    public static class ReviewInfo {
+    public interface ReviewItem {
+        int id = -1;
+    }
+
+    public static class ReviewInfo implements ReviewItem {
         protected String user;
         protected String date;
         protected float rating;
         protected String title;
         protected String description;
         protected int id;
+    }
+
+    public static class ReviewHeader implements ReviewItem {
     }
 }

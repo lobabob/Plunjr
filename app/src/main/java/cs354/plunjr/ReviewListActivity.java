@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import com.whinc.widget.ratingbar.RatingBar;
 
@@ -29,7 +30,6 @@ public class ReviewListActivity extends AppCompatActivity implements WriteReview
 
     private DateFormat parseDatePattern;
     private DateFormat formatDatePattern;
-    private WriteReviewDialogFragment mDialog;
     private ReviewListAdapter mReviewListAdapter;
 
     @Override
@@ -51,27 +51,23 @@ public class ReviewListActivity extends AppCompatActivity implements WriteReview
         final double lat = extras.getDouble("restroomLat");
         final double lng = extras.getDouble("restroomLng");
 
-        mDialog = new WriteReviewDialogFragment();
-        mReviewListAdapter = new ReviewListAdapter(new ArrayList<ReviewListAdapter.ReviewInfo>());
+        mReviewListAdapter = new ReviewListAdapter(this, lat, lng, new ArrayList<ReviewListAdapter.ReviewItem>());
+
         initReviewListAdapter();
         new LoadReviewsTask().execute(restroomID);
+    }
 
-        RatingBar rb = (RatingBar) findViewById(R.id.newRating);
+    @Override
+    public void onDialogPositiveClick() {
+        onDialogNegativeClick();
+    }
 
-        rb.setOnRatingChangeListener(new RatingBar.OnRatingChangeListener() {
-            @Override
-            public void onChange(RatingBar ratingBar, int preCount, int curCount) {
-                if (curCount > 0) {
-                    Bundle args = new Bundle();
-                    args.putInt("rating", curCount);
-                    args.putDouble("lat", lat);
-                    args.putDouble("lng", lng);
+    @Override
+    public void onDialogNegativeClick() {
+        RecyclerView list = (RecyclerView) findViewById(R.id.reviewList);
+        LinearLayout header = (LinearLayout) list.findViewById(R.id.reviewListHeader);
 
-                    mDialog.setArguments(args);
-                    mDialog.show(getFragmentManager(), "dialog");
-                }
-            }
-        });
+        ((com.whinc.widget.ratingbar.RatingBar) header.findViewById(R.id.newRating)).setCount(0);
     }
 
     private void initReviewListAdapter() {
@@ -83,16 +79,6 @@ public class ReviewListActivity extends AppCompatActivity implements WriteReview
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         reviewListView.setLayoutManager(llm);
         reviewListView.setAdapter(mReviewListAdapter);
-    }
-
-    @Override
-    public void onDialogPositiveClick() {
-        onDialogNegativeClick();
-    }
-
-    @Override
-    public void onDialogNegativeClick() {
-        ((RatingBar) findViewById(R.id.newRating)).setCount(0);
     }
 
     private class LoadReviewsTask extends AsyncTask<Integer, Void, Void> {
