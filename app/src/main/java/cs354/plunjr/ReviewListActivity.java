@@ -1,5 +1,6 @@
 package cs354.plunjr;
 
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -8,7 +9,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+
+import com.whinc.widget.ratingbar.RatingBar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class ReviewListActivity extends AppCompatActivity {
+public class ReviewListActivity extends AppCompatActivity implements WriteReviewDialogFragment.WriteReviewDialogListener {
 
     private DateFormat parseDatePattern;
     private DateFormat formatDatePattern;
@@ -50,11 +54,19 @@ public class ReviewListActivity extends AppCompatActivity {
         initReviewListAdapter();
         new LoadReviewsTask().execute(restroomID);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        RatingBar rb = (RatingBar) findViewById(R.id.newRating);
+
+        rb.setOnRatingChangeListener(new RatingBar.OnRatingChangeListener() {
             @Override
-            public void onClick(View view) {
-                mDialog.show(getFragmentManager(), "dialog");
+            public void onChange(RatingBar ratingBar, int preCount, int curCount) {
+                if (curCount > 0) {
+                    Bundle args = new Bundle();
+                    args.putInt("rating", curCount);
+                    // TODO Pass in restroom address as well
+
+                    mDialog.setArguments(args);
+                    mDialog.show(getFragmentManager(), "dialog");
+                }
             }
         });
     }
@@ -70,13 +82,23 @@ public class ReviewListActivity extends AppCompatActivity {
         reviewListView.setAdapter(mReviewListAdapter);
     }
 
+    @Override
+    public void onDialogPositiveClick() {
+        onDialogNegativeClick();
+    }
+
+    @Override
+    public void onDialogNegativeClick() {
+        ((RatingBar) findViewById(R.id.newRating)).setCount(0);
+    }
+
     private class LoadReviewsTask extends AsyncTask<Integer, Void, Void> {
 
         @Override
         protected Void doInBackground(Integer... params) {
             try {
-//                JSONArray reviews = new JSONArray(getResources().getString(R.string.debug_review_json));
-                JSONArray reviews = new PlunjrAPIClient().getReviews(getApplicationContext(), params[0]);
+                JSONArray reviews = new JSONArray(getResources().getString(R.string.debug_review_json));
+//                JSONArray reviews = new PlunjrAPIClient().getReviews(getApplicationContext(), params[0]);
 
                 // Create a hash map for each row's data (one hash map per row)
                 for(int i = 0; i < reviews.length(); i++) {

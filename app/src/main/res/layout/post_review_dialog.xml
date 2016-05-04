@@ -13,9 +13,9 @@
         android:layout_height="60dp"
         android:layout_gravity="center"
         android:clickable="true"
-        android:numStars="5"
         app:rb_max_count="5"
         app:rb_click_rating="true"
+        app:rb_touch_rating="true"
         app:rb_empty="@drawable/ic_star_border_36dp"
         app:rb_fill="@drawable/ic_star_fill_36dp" />
 

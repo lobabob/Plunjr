@@ -166,6 +166,9 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         refreshRestrooms();
     }
 
+    @Override
+    public void onDialogNegativeClick() {}
+
     private LatLng getUserLatLng() {
         LatLng myPosition = null;
 
