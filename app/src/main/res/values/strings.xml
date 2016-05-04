@@ -20,9 +20,11 @@
     <!-- Menu items -->
     <string name="menu_write_review">Write a Review</string>
     <string name="sort_options_title">Sort:</string>
+    <string name="sort_options_closeness">Closest</string>
+    <string name="sort_options_rating">Highest Rated</string>
     <string-array name="sort_options">
-        <item>Closest</item>
-        <item>Highest Rated</item>
+        <item>@string/sort_options_closeness</item>
+        <item>@string/sort_options_rating</item>
     </string-array>
 
     <!-- API endpoints -->

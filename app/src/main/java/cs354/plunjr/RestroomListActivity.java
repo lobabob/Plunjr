@@ -108,17 +108,11 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         sortOptionsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(position == 0) {
-                    mRestroomListAdapter.sortByCloseness();
-                } else {
-                    mRestroomListAdapter.sortByRating();
-                }
+                sortRestroomList();
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
         // Begin map initialization
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -146,9 +140,8 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         centerMapCamera();
-        if(mAsyncTaskCounter.decrementAndGet() <= 0) {
-            placeMapPins();
-        }
+        placeMapPins();
+
         // Prevent vertical scrolls on map from scrolling the Recycler view
         CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) findViewById(R.id.appbar).getLayoutParams();
         AppBarLayout.Behavior behavior = new AppBarLayout.Behavior();
@@ -189,7 +182,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
     }
 
     private void placeMapPins() {
-        if(mRestroomListAdapter.getItemCount() > 0) {
+        if(mAsyncTaskCounter.decrementAndGet() <= 0 && mRestroomListAdapter.getItemCount() > 0) {
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             for(int i = 0; i < mRestroomListAdapter.getItemCount(); i++) {
                 RestroomListAdapter.RestroomInfo rrInfo = mRestroomListAdapter.get(i);
@@ -202,6 +195,15 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
             }
             CameraUpdate update = CameraUpdateFactory.newLatLngBounds(builder.build(), 10);
             mMap.animateCamera(update);
+        }
+    }
+
+    private void sortRestroomList() {
+        String sortOption = ((Spinner) findViewById(R.id.sort_options_spinner)).getSelectedItem().toString();
+        if(sortOption.equals(getString(R.string.sort_options_rating))) {
+            mRestroomListAdapter.sortByRating();
+        } else {
+            mRestroomListAdapter.sortByCloseness();
         }
     }
 
@@ -262,11 +264,8 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         @Override
         protected void onPostExecute(Void result) {
             mSwipeRefreshLayout.setRefreshing(false);
-            mRestroomListAdapter.sortByCloseness();
-            mRestroomListAdapter.notifyDataSetChanged();
-            if(mAsyncTaskCounter.decrementAndGet() <= 0) {
-                placeMapPins();
-            }
+            sortRestroomList();
+            placeMapPins();
         }
     }
 }
