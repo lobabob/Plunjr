@@ -133,7 +133,9 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mDialog.show(getFragmentManager(), "dialog");
+                if(!mDialog.isAdded()) {
+                    mDialog.show(getFragmentManager(), "dialog");
+                }
             }
         });
     }
