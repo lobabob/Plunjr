@@ -4,13 +4,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.ListView;
-import android.widget.RatingBar;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,18 +19,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public class ReviewListActivity extends AppCompatActivity {
 
     private DateFormat parseDatePattern;
     private DateFormat formatDatePattern;
-    private List<Map<String, String>> reviewList = new ArrayList<>();
     private WriteReviewDialogFragment mDialog;
+    private ReviewListAdapter mReviewListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +46,8 @@ public class ReviewListActivity extends AppCompatActivity {
         setTitle(extras.getString("restroomName"));
 
         mDialog = new WriteReviewDialogFragment();
+        mReviewListAdapter = new ReviewListAdapter(new ArrayList<ReviewListAdapter.ReviewInfo>());
+        initReviewListAdapter();
         new LoadReviewsTask().execute(restroomID);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -64,43 +60,14 @@ public class ReviewListActivity extends AppCompatActivity {
     }
 
     private void initReviewListAdapter() {
-        String[] from = {"user", "date", "rating", "title", "description"};
-        int[] to = {R.id.reviewerName, R.id.reviewDate, R.id.reviewRating, R.id.reviewTitle, R.id.reviewDescription};
-
         // Bind data in each hash map to a corresponding row in the list view
-        ListView reviewListView = (ListView) findViewById(R.id.reviewList);
+        RecyclerView reviewListView = (RecyclerView) findViewById(R.id.reviewList);
 
-        SimpleAdapter reviewListViewAdapter = new SimpleAdapter(this, reviewList, R.layout.review_item, from, to);
-        reviewListViewAdapter.setViewBinder(new ReviewListViewBinder());
-        reviewListView.setAdapter(reviewListViewAdapter);
-    }
-
-    private class ReviewListViewBinder implements SimpleAdapter.ViewBinder {
-        @Override
-        public boolean setViewValue(View view, Object data, String textRepresentation) {
-            if(view.getId() == R.id.reviewRating) {
-                RatingBar bar = (RatingBar) view;
-                bar.setRating(Float.parseFloat(textRepresentation));
-            } else {
-                TextView text = (TextView) view;
-
-                if(view.getId() == R.id.reviewDate) {
-                    try {
-                        Date date = parseDatePattern.parse(textRepresentation);
-                        textRepresentation = formatDatePattern.format(date);
-                    } catch (ParseException e) {
-                        Log.e("Date parsing/formatting", e.getMessage(), e);
-
-                        textRepresentation = "Invalid Date";
-                    }
-                }
-                if (textRepresentation.equals("")) {
-                    view.setVisibility(View.GONE);
-                }
-                text.setText(textRepresentation);
-            }
-            return true;
-        }
+        reviewListView.setHasFixedSize(true);
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        reviewListView.setLayoutManager(llm);
+        reviewListView.setAdapter(mReviewListAdapter);
     }
 
     private class LoadReviewsTask extends AsyncTask<Integer, Void, Void> {
@@ -114,14 +81,25 @@ public class ReviewListActivity extends AppCompatActivity {
                 // Create a hash map for each row's data (one hash map per row)
                 for(int i = 0; i < reviews.length(); i++) {
                     JSONObject review = reviews.getJSONObject(i);
-                    HashMap<String, String> rowData = new HashMap<>();
+                    ReviewListAdapter.ReviewInfo rowData = new ReviewListAdapter.ReviewInfo();
 
-                    Iterator<String> keys = review.keys();
-                    while(keys.hasNext()) {
-                        String key = keys.next();
-                        rowData.put(key, review.optString(key));
+                    rowData.user = review.optString("user");
+                    rowData.rating = (float) review.optDouble("rating");
+                    rowData.title = review.optString("title");
+                    rowData.description = review.optString("description");
+                    rowData.id = review.optInt("id");
+
+                    rowData.date = review.optString("date");
+
+                    try {
+                        Date date = parseDatePattern.parse(rowData.date);
+                        rowData.date = formatDatePattern.format(date);
+                    } catch (ParseException e) {
+                        Log.e("Date parsing/formatting", e.getMessage(), e);
+                        rowData.date = "Invalid Date";
                     }
-                    reviewList.add(rowData);
+
+                    mReviewListAdapter.add(rowData);
                 }
             } catch(JSONException e) {
                 Log.e("Review List", e.getMessage(), e);
@@ -131,7 +109,7 @@ public class ReviewListActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void result) {
-            initReviewListAdapter();
+            mReviewListAdapter.notifyDataSetChanged();
         }
     }
 }
