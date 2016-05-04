@@ -38,11 +38,14 @@ public class AddressUtils {
     public static LatLng getAddressLatLng(Context context, String addressString) {
         Geocoder coder = new Geocoder(context);
         try {
-            Address address = coder.getFromLocationName(addressString, 1).get(0);
-            return new LatLng(address.getLatitude(), address.getLongitude());
+            List<Address> addresses = coder.getFromLocationName(addressString, 1);
+            if(addresses.size() > 0) {
+                return new LatLng(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
+            }
         } catch (IOException e) {
-            return null;
+            Log.e("Address Utils", e.getMessage(), e);
         }
+        return null;
     }
 
     public static String getAddressFeatureName(Context context, String addressString) {

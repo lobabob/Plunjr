@@ -102,9 +102,12 @@ public class WriteReviewDialogFragment extends DialogFragment {
 
                         // Get lat and long of restroom as a string
                         LatLng rrLatLng = AddressUtils.getAddressLatLng(getActivity(), address);
-                        String lat = String.valueOf(rrLatLng.latitude);
-                        String lng = String.valueOf(rrLatLng.longitude);
-
+                        String lat = "";
+                        String lng = "";
+                        if(rrLatLng != null) {
+                            lat = String.valueOf(rrLatLng.latitude);
+                            lng = String.valueOf(rrLatLng.longitude);
+                        }
                         String name = AddressUtils.getAddressFeatureName(getActivity(), address);
                         name = name != null ? name : address;
 
