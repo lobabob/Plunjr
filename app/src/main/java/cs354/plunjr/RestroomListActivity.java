@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -70,12 +71,14 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         // Begin map initialization
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+        // Recalculate map height to be a percentage of the viewport height
         ViewGroup.LayoutParams mapParams = mapFragment.getView().getLayoutParams();
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         mapParams.height = (int) (metrics.heightPixels * MAP_FRAGMENT_VH);
         mapFragment.getView().setLayoutParams(mapParams);
-        mapFragment.getMapAsync(this);
 
         // Set up toolbar
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -114,10 +117,9 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshRestrooms();
+                loadRestrooms();
             }
         });
-
         // Set up sort options spinner
         Spinner sortOptionsSpinner = (Spinner) findViewById(R.id.sort_options_spinner);
         ArrayAdapter<CharSequence> sortOptionsAdapter = ArrayAdapter.createFromResource(this, R.array.sort_options, R.layout.support_simple_spinner_dropdown_item);
@@ -152,7 +154,12 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
-        centerMapCamera();
+
+        // Center map on user's location before placing map pins
+        LatLng myPosition = getUserLatLng();
+        if(myPosition != null && mMap != null) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 15.5f));
+        }
         placeMapPins();
 
         // Prevent vertical scrolls on map from scrolling the Recycler view
@@ -169,7 +176,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
 
     @Override
     public void onDialogPositiveClick() {
-        refreshRestrooms();
+        loadRestrooms();
     }
 
     @Override
@@ -183,29 +190,23 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         String provider = locationManager.getBestProvider(new Criteria(), true);
         Location location = locationManager.getLastKnownLocation(provider);
 
-        // Zoom in on user's current location
         if(location != null) {
             myPosition = new LatLng(location.getLatitude(), location.getLongitude());
         }
         return myPosition;
     }
 
-    private void centerMapCamera() {
-        LatLng myPosition = getUserLatLng();
-        if(myPosition != null && mMap != null) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 15.5f));
-        }
-    }
-
     private void placeMapPins() {
         if(mAsyncTaskCounter.decrementAndGet() <= 0 && mRestroomListAdapter.getItemCount() > 0) {
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            mMap.clear();
 
             // Scale plunger icon
             int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAP_MARKER_SIZE_DP, getResources().getDisplayMetrics());
             Bitmap icon = ((BitmapDrawable) ResourcesCompat.getDrawable(getResources(), R.drawable.plunger, null)).getBitmap();
             Bitmap scaledIcon = Bitmap.createScaledBitmap(icon, px, px, false);
 
+            // Place map pins
             for(int i = 0; i < mRestroomListAdapter.getItemCount(); i++) {
                 RestroomListAdapter.RestroomInfo rrInfo = mRestroomListAdapter.get(i);
                 MarkerOptions marker = new MarkerOptions()
@@ -215,8 +216,13 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
                 mMap.addMarker(marker);
                 builder.include(rrInfo.latLng);
             }
-            CameraUpdate update = CameraUpdateFactory.newLatLngBounds(builder.build(), 10);
-            mMap.animateCamera(update);
+            try {
+                CameraUpdate update = CameraUpdateFactory.newLatLngBounds(builder.build(), 10);
+                mMap.animateCamera(update);
+            } catch(IllegalStateException e) {
+                // No points nearby, nothing too bad should happen
+                Toast.makeText(this, "No nearby restrooms found", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -236,10 +242,10 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         restroomListView.setLayoutManager(llm);
         restroomListView.setAdapter(mRestroomListAdapter);
-        refreshRestrooms();
+        loadRestrooms();
     }
 
-    private void refreshRestrooms() {
+    private void loadRestrooms() {
         new LoadRestroomsTask().execute(this);
     }
 
@@ -252,16 +258,15 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         protected Void doInBackground(Context... params) {
             try {
                 mRestroomListAdapter.clear();
-                LatLng myPosition = getUserLatLng();
-                if(myPosition != null) {
-                    JSONArray restrooms = new PlunjrAPIClient().getRestrooms(params[0], myPosition.latitude, myPosition.longitude);
+                LatLng myPos = getUserLatLng();
+                if(myPos != null) {
+                    JSONArray restrooms = new PlunjrAPIClient().getRestrooms(params[0], myPos.latitude, myPos.longitude);
 
                     for (int i = 0; i < restrooms.length(); i++) {
                         JSONObject restroom = restrooms.getJSONObject(i);
                         RestroomListAdapter.RestroomInfo rrInfo = new RestroomListAdapter.RestroomInfo();
 
                         // Calculate restroom distance from user
-                        LatLng myPos = getUserLatLng();
                         LatLng rrPos = new LatLng(restroom.optDouble("lat"), restroom.optDouble("lng"));
                         float res[] = {0};
                         Location.distanceBetween(rrPos.latitude, rrPos.longitude, myPos.latitude, myPos.longitude, res);
