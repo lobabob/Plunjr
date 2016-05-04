@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             app:contentScrim="?attr/colorPrimary"
             app:statusBarScrim="?attr/colorPrimaryDark"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -53,8 +53,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="5dp"
-            android:background="@android:color/white"
-            app:layout_scrollFlags="scroll">
+            android:background="@color/colorBackground">
 
             <TextView
                 android:layout_width="wrap_content"
