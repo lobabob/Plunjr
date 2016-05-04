@@ -31,6 +31,7 @@ public class ReviewListActivity extends AppCompatActivity implements WriteReview
     private DateFormat parseDatePattern;
     private DateFormat formatDatePattern;
     private ReviewListAdapter mReviewListAdapter;
+    private int restroomID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +47,7 @@ public class ReviewListActivity extends AppCompatActivity implements WriteReview
                 getResources().getString(R.string.review_format_date), Locale.ROOT);
 
         Bundle extras = getIntent().getExtras();
-        int restroomID = extras.getInt("restroomID");
+        this.restroomID = extras.getInt("restroomID");
         setTitle(extras.getString("restroomName"));
         final double lat = extras.getDouble("restroomLat");
         final double lng = extras.getDouble("restroomLng");
@@ -54,11 +55,16 @@ public class ReviewListActivity extends AppCompatActivity implements WriteReview
         mReviewListAdapter = new ReviewListAdapter(this, lat, lng, new ArrayList<ReviewListAdapter.ReviewItem>());
 
         initReviewListAdapter();
-        new LoadReviewsTask().execute(restroomID);
+        loadRestrooms();
+    }
+
+    private void loadRestrooms() {
+        new LoadReviewsTask().execute(this.restroomID);
     }
 
     @Override
     public void onDialogPositiveClick() {
+        loadRestrooms();
         onDialogNegativeClick();
     }
 
@@ -88,6 +94,8 @@ public class ReviewListActivity extends AppCompatActivity implements WriteReview
             try {
 //                JSONArray reviews = new JSONArray(getResources().getString(R.string.debug_review_json));
                 JSONArray reviews = new PlunjrAPIClient().getReviews(getApplicationContext(), params[0]);
+
+                mReviewListAdapter.clear();
 
                 // Create a hash map for each row's data (one hash map per row)
                 for(int i = 0; i < reviews.length(); i++) {

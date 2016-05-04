@@ -52,6 +52,10 @@ public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         v.setText(text);
     }
 
+    public void clear() {
+        reviews.subList(1, reviews.size()).clear();
+    }
+
     @Override
     public long getItemId(int position) {
         return reviews.get(position).id;
