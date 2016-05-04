@@ -48,6 +48,8 @@ public class ReviewListActivity extends AppCompatActivity implements WriteReview
         Bundle extras = getIntent().getExtras();
         int restroomID = extras.getInt("restroomID");
         setTitle(extras.getString("restroomName"));
+        final double lat = extras.getDouble("restroomLat");
+        final double lng = extras.getDouble("restroomLng");
 
         mDialog = new WriteReviewDialogFragment();
         mReviewListAdapter = new ReviewListAdapter(new ArrayList<ReviewListAdapter.ReviewInfo>());
@@ -62,7 +64,8 @@ public class ReviewListActivity extends AppCompatActivity implements WriteReview
                 if (curCount > 0) {
                     Bundle args = new Bundle();
                     args.putInt("rating", curCount);
-                    // TODO Pass in restroom address as well
+                    args.putDouble("lat", lat);
+                    args.putDouble("lng", lng);
 
                     mDialog.setArguments(args);
                     mDialog.show(getFragmentManager(), "dialog");

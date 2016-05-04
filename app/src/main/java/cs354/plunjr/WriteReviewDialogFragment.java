@@ -15,6 +15,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.whinc.widget.ratingbar.RatingBar;
@@ -24,6 +25,8 @@ public class WriteReviewDialogFragment extends DialogFragment {
 
     WriteReviewDialogListener mWriteReviewDialogListener;
     int selectedRating;
+    double latValue;
+    double lngValue;
 
     // Used to notify parent activity of a positive click
     public interface WriteReviewDialogListener {
@@ -68,9 +71,13 @@ public class WriteReviewDialogFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         selectedRating = 0;
+        latValue = 200;
+        lngValue = 200;
 
         if (args != null) {
             selectedRating = getArguments().getInt("rating");
+            latValue = getArguments().getFloat("lat");
+            lngValue = getArguments().getFloat("lng");
         }
     }
 
@@ -81,6 +88,13 @@ public class WriteReviewDialogFragment extends DialogFragment {
 
         // Set initial selected rating in review creation dialog
         ((RatingBar) dialogView.findViewById(R.id.dialog_rating)).setCount(selectedRating);
+
+        // Remove address block if latitude and longitude have already been provided
+        if (latValue < 200) {
+            ((LinearLayout) dialogView.findViewById(R.id.dialog_address_block)).setVisibility(View.GONE);
+        } else {
+            ((LinearLayout) dialogView.findViewById(R.id.dialog_address_block)).setVisibility(View.VISIBLE);
+        }
 
         final AlertDialog d = builder.setTitle(R.string.dialog_title)
                 .setPositiveButton(R.string.dialog_submit, null)
@@ -100,14 +114,21 @@ public class WriteReviewDialogFragment extends DialogFragment {
                         String title   = ((EditText) dialogView.findViewById(R.id.dialog_title)).getText().toString();
                         String rating  = String.valueOf(((RatingBar) dialogView.findViewById(R.id.dialog_rating)).getCount());
 
-                        // Get lat and long of restroom as a string
-                        LatLng rrLatLng = AddressUtils.getAddressLatLng(getActivity(), address);
                         String lat = "";
                         String lng = "";
-                        if(rrLatLng != null) {
-                            lat = String.valueOf(rrLatLng.latitude);
-                            lng = String.valueOf(rrLatLng.longitude);
+
+                        // Get lat and long of restroom as a string
+                        if (latValue < 200) {
+                            lat = String.valueOf(latValue);
+                            lng = String.valueOf(lngValue);
+                        } else {
+                            LatLng rrLatLng = AddressUtils.getAddressLatLng(getActivity(), address);
+                            if(rrLatLng != null) {
+                                lat = String.valueOf(rrLatLng.latitude);
+                                lng = String.valueOf(rrLatLng.longitude);
+                            }
                         }
+
                         String name = AddressUtils.getAddressFeatureName(getActivity(), address);
                         name = name != null ? name : address;
 

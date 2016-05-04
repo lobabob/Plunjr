@@ -30,6 +30,7 @@
 
     <!-- Address entry -->
     <LinearLayout
+        android:id="@+id/dialog_address_block"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
