@@ -65,6 +65,7 @@ public class WriteReviewDialogFragment extends DialogFragment {
                         String lng = String.valueOf(rrLatLng.longitude);
 
                         String name = AddressUtils.getAddressFeatureName(getActivity(), address);
+                        name = name != null ? name : address;
 
                         // Post review if input is valid
                         if(validateInput(dialogView)) {

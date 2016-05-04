@@ -48,11 +48,14 @@ public class AddressUtils {
     public static String getAddressFeatureName(Context context, String addressString) {
         Geocoder coder = new Geocoder(context);
         try {
-            Address address = coder.getFromLocationName(addressString, 1).get(0);
-            return address.getFeatureName();
+            List<Address> addresses = coder.getFromLocationName(addressString, 1);
+            if(addresses.size() > 0) {
+                return addresses.get(0).getFeatureName();
+            }
         } catch (IOException e) {
-            return null;
+            Log.e("Address Utils", e.getMessage(), e);
         }
+        return null;
     }
 
     public static String formatAsString(Address address) {
