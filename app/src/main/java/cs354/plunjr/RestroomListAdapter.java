@@ -56,6 +56,8 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
                 Intent intent = new Intent(view.getContext(), ReviewListActivity.class);
                 intent.putExtra("restroomID", rr.id);
                 intent.putExtra("restroomName", rr.name);
+                intent.putExtra("restroomLat", rr.latLng.latitude);
+                intent.putExtra("restroomLng", rr.latLng.longitude);
                 view.getContext().startActivity(intent);
             }
         });
