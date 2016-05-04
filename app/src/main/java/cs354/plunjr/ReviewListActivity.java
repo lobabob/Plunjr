@@ -97,8 +97,8 @@ public class ReviewListActivity extends AppCompatActivity implements WriteReview
         @Override
         protected Void doInBackground(Integer... params) {
             try {
-                JSONArray reviews = new JSONArray(getResources().getString(R.string.debug_review_json));
-//                JSONArray reviews = new PlunjrAPIClient().getReviews(getApplicationContext(), params[0]);
+//                JSONArray reviews = new JSONArray(getResources().getString(R.string.debug_review_json));
+                JSONArray reviews = new PlunjrAPIClient().getReviews(getApplicationContext(), params[0]);
 
                 // Create a hash map for each row's data (one hash map per row)
                 for(int i = 0; i < reviews.length(); i++) {
