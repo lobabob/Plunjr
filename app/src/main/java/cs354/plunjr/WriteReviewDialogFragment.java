@@ -5,9 +5,13 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -18,13 +22,12 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class WriteReviewDialogFragment extends DialogFragment {
 
+    WriteReviewDialogListener mWriteReviewDialogListener;
+
     // Used to notify parent activity of a positive click
     public interface WriteReviewDialogListener {
         void onDialogPositiveClick();
     }
-
-    WriteReviewDialogListener mWriteReviewDialogListener;
-
 
     @Override
     public void onAttach(Activity activity) {
@@ -33,6 +36,16 @@ public class WriteReviewDialogFragment extends DialogFragment {
             mWriteReviewDialogListener = (WriteReviewDialogListener) activity;
         } catch(ClassCastException e) {
             // Parent activity must implement WriteReviewDialogListener interface
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Dialog dialog = getDialog();
+        if (dialog != null) {
+            dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
         }
     }
 

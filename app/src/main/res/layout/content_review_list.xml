@@ -6,16 +6,30 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="cs354.plunjr.ReviewListActivity"
+    android:background="@color/colorWhite"
     tools:showIn="@layout/activity_review_list" >
+
+    <!-- Rating -->
+    <com.whinc.widget.ratingbar.RatingBar
+        android:id="@+id/newRating"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:clickable="true"
+        android:numStars="5"
+        app:rb_max_count="5"
+        app:rb_click_rating="true"
+        app:rb_empty="@drawable/ic_star_border_36dp"
+        app:rb_fill="@drawable/ic_star_fill_36dp" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/reviewList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/newRating"
         android:divider="@android:color/transparent"
         android:fitsSystemWindows="true"
         android:scrollbars="vertical"
-        android:background="@color/colorWhite"
         android:clipToPadding="false"
         android:paddingBottom="90dp"
         android:dividerHeight="17dp" />

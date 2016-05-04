@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="10dp">
 
     <!-- Rating -->
-    <RatingBar
+    <com.whinc.widget.ratingbar.RatingBar
         android:id="@+id/dialog_rating"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
         android:layout_gravity="center"
-        android:progressTint="@color/colorPrimary"
-        android:secondaryProgressTint="@color/colorPrimaryDark"
-        android:progressBackgroundTint="@color/colorPrimaryDark"
         android:clickable="true"
-        android:numStars="5"/>
+        android:numStars="5"
+        app:rb_max_count="5"
+        app:rb_click_rating="true"
+        app:rb_empty="@drawable/ic_star_border_36dp"
+        app:rb_fill="@drawable/ic_star_fill_36dp" />
 
     <!-- Field required warning (address) -->
     <TextView
