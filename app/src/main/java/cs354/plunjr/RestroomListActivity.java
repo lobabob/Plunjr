@@ -1,7 +1,9 @@
 package cs354.plunjr;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -14,6 +16,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +25,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -33,6 +37,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -48,6 +53,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
 
     private static final double METERS_PER_MILE = 1609.344;
     private static final double MAP_FRAGMENT_VH = 0.4;
+    private static final int MAP_MARKER_SIZE_DP = 60;
     private static AtomicInteger mAsyncTaskCounter = new AtomicInteger(2);
 
     private RestroomListAdapter mRestroomListAdapter;
@@ -194,12 +200,18 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
     private void placeMapPins() {
         if(mAsyncTaskCounter.decrementAndGet() <= 0 && mRestroomListAdapter.getItemCount() > 0) {
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+            // Scale plunger icon
+            int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAP_MARKER_SIZE_DP, getResources().getDisplayMetrics());
+            Bitmap icon = ((BitmapDrawable) ResourcesCompat.getDrawable(getResources(), R.drawable.plunger, null)).getBitmap();
+            Bitmap scaledIcon = Bitmap.createScaledBitmap(icon, px, px, false);
+
             for(int i = 0; i < mRestroomListAdapter.getItemCount(); i++) {
                 RestroomListAdapter.RestroomInfo rrInfo = mRestroomListAdapter.get(i);
                 MarkerOptions marker = new MarkerOptions()
                         .position(rrInfo.latLng)
-                        .title(rrInfo.name);
-                        //.icon(BitmapDescriptorFactory.fromResource(R.drawable.plunger))
+                        .title(rrInfo.name)
+                        .icon(BitmapDescriptorFactory.fromBitmap(scaledIcon));
                 mMap.addMarker(marker);
                 builder.include(rrInfo.latLng);
             }
