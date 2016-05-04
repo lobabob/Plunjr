@@ -20,6 +20,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -94,6 +97,27 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
                 refreshRestrooms();
             }
         });
+
+        // Set up sort options spinner
+        Spinner sortOptionsSpinner = (Spinner) findViewById(R.id.sort_options_spinner);
+        ArrayAdapter<CharSequence> sortOptionsAdapter = ArrayAdapter.createFromResource(this, R.array.sort_options, R.layout.support_simple_spinner_dropdown_item);
+        sortOptionsAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+        sortOptionsSpinner.setAdapter(sortOptionsAdapter);
+        sortOptionsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(position == 0) {
+                    mRestroomListAdapter.sortByCloseness();
+                } else {
+                    mRestroomListAdapter.sortByRating();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         // Begin map initialization
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -155,13 +179,13 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         if(mRestroomListAdapter.getItemCount() > 0) {
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             for(int i = 0; i < mRestroomListAdapter.getItemCount(); i++) {
-                LatLng rrPos = mRestroomListAdapter.get(i).latLng;
+                RestroomListAdapter.RestroomInfo rrInfo = mRestroomListAdapter.get(i);
                 MarkerOptions marker = new MarkerOptions()
-                        .position(rrPos);
+                        .position(rrInfo.latLng)
+                        .title(rrInfo.name);
                         //.icon(BitmapDescriptorFactory.fromResource(R.drawable.plunger))
-                        //.title("test");
                 mMap.addMarker(marker);
-                builder.include(rrPos);
+                builder.include(rrInfo.latLng);
             }
             CameraUpdate update = CameraUpdateFactory.newLatLngBounds(builder.build(), 10);
             mMap.animateCamera(update);

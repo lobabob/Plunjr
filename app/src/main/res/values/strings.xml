@@ -20,6 +20,11 @@
 
     <!-- Menu items -->
     <string name="menu_write_review">Write a Review</string>
+    <string name="sort_options_title">Sort:</string>
+    <string-array name="sort_options">
+        <item>Closest</item>
+        <item>Highest Rated</item>
+    </string-array>
 
     <!-- API endpoints -->
     <string name="get_restrooms_uri" formatted="false">http://104.130.132.153/api/restrooms?lat=%f&amp;lng=%f&amp;radius=1600</string>
