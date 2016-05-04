@@ -20,8 +20,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -40,12 +42,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RestroomListActivity extends AppCompatActivity implements OnMapReadyCallback, WriteReviewDialogFragment.WriteReviewDialogListener {
 
     private static final double METERS_PER_MILE = 1609.344;
+    private static final double MAP_FRAGMENT_VH = 0.4;
     private static AtomicInteger mAsyncTaskCounter = new AtomicInteger(2);
 
     private RestroomListAdapter mRestroomListAdapter;
@@ -58,6 +60,16 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restroom_list);
+
+        // Begin map initialization
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        ViewGroup.LayoutParams mapParams = mapFragment.getView().getLayoutParams();
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        mapParams.height = (int) (metrics.heightPixels * MAP_FRAGMENT_VH);
+        mapFragment.getView().setLayoutParams(mapParams);
+        mapFragment.getMapAsync(this);
 
         // Set up toolbar
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -114,11 +126,6 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
-        // Begin map initialization
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
         mDialog = new WriteReviewDialogFragment();
         mRestroomListAdapter = new RestroomListAdapter(new ArrayList<RestroomListAdapter.RestroomInfo>());
         initRestroomList();
