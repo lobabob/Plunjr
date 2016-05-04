@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -23,6 +24,7 @@ import com.whinc.widget.ratingbar.RatingBar;
 
 public class WriteReviewDialogFragment extends DialogFragment {
 
+    private static final int INVALID_LATLNG = 200;  // Valid Lat/Lng must be below this value
     WriteReviewDialogListener mWriteReviewDialogListener;
     int selectedRating;
     double latValue;
@@ -71,13 +73,13 @@ public class WriteReviewDialogFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         selectedRating = 0;
-        latValue = 200;
-        lngValue = 200;
+        latValue = INVALID_LATLNG;
+        lngValue = INVALID_LATLNG;
 
         if (args != null) {
             selectedRating = getArguments().getInt("rating");
-            latValue = getArguments().getFloat("lat");
-            lngValue = getArguments().getFloat("lng");
+            latValue = getArguments().getDouble("lat");
+            lngValue = getArguments().getDouble("lng");
         }
     }
 
@@ -90,10 +92,8 @@ public class WriteReviewDialogFragment extends DialogFragment {
         ((RatingBar) dialogView.findViewById(R.id.dialog_rating)).setCount(selectedRating);
 
         // Remove address block if latitude and longitude have already been provided
-        if (latValue < 200) {
+        if (latValue < INVALID_LATLNG) {
             ((LinearLayout) dialogView.findViewById(R.id.dialog_address_block)).setVisibility(View.GONE);
-        } else {
-            ((LinearLayout) dialogView.findViewById(R.id.dialog_address_block)).setVisibility(View.VISIBLE);
         }
 
         final AlertDialog d = builder.setTitle(R.string.dialog_title)
@@ -118,7 +118,7 @@ public class WriteReviewDialogFragment extends DialogFragment {
                         String lng = "";
 
                         // Get lat and long of restroom as a string
-                        if (latValue < 200) {
+                        if (latValue < INVALID_LATLNG) {
                             lat = String.valueOf(latValue);
                             lng = String.valueOf(lngValue);
                         } else {
@@ -167,7 +167,7 @@ public class WriteReviewDialogFragment extends DialogFragment {
         View titleWarning   = v.findViewById(R.id.dialog_title_warning);
 
         // Validate address
-        if(!AddressUtils.isAddressValid(getActivity(), address.getText().toString())) {
+        if(latValue >= INVALID_LATLNG && !AddressUtils.isAddressValid(getActivity(), address.getText().toString())) {
             addressWarning.setVisibility(View.VISIBLE);
             valid = false;
         } else {
