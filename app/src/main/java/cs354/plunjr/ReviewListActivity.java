@@ -28,7 +28,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class ReviewListActivity extends AppCompatActivity implements OnMapReadyCallback, WriteReviewDialogFragment.WriteReviewDialogListener {
@@ -61,9 +63,15 @@ public class ReviewListActivity extends AppCompatActivity implements OnMapReadyC
         String restroomName = extras.getString("restroomName");
         this.lat = extras.getDouble("restroomLat");
         this.lng = extras.getDouble("restroomLng");
+        String[] imgUrls = extras.getStringArray("imgUrls");
+
+        if (imgUrls == null) {
+            imgUrls = new String[0];
+        }
 
         ReviewListAdapter.ReviewHeader header = new ReviewListAdapter.ReviewHeader();
         header.title = restroomName;
+        header.imgUrls = imgUrls;
         mReviewListAdapter = new ReviewListAdapter(this, lat, lng, header, new ArrayList<ReviewListAdapter.ReviewItem>());
 
         this.mapUtil = new MapUtility(this);
