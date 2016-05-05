@@ -1,19 +1,24 @@
 package cs354.plunjr;
 
-import android.content.DialogInterface;
+import android.graphics.Rect;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.LinearLayout;
 
-import com.whinc.widget.ratingbar.RatingBar;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,20 +31,25 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class ReviewListActivity extends AppCompatActivity implements WriteReviewDialogFragment.WriteReviewDialogListener {
+public class ReviewListActivity extends AppCompatActivity implements OnMapReadyCallback, WriteReviewDialogFragment.WriteReviewDialogListener {
+
+    private static final double MAP_FRAGMENT_VH = 0.4;
+    private static final int MAP_MARKER_SIZE_DP = 60;
 
     private DateFormat parseDatePattern;
     private DateFormat formatDatePattern;
     private ReviewListAdapter mReviewListAdapter;
+    private GoogleMap mMap;
+    private MapUtility mapUtil;
     private int restroomID;
+    private double lat;
+    private double lng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_review_list);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setTitle("");
 
         parseDatePattern = new SimpleDateFormat(
                 getResources().getString(R.string.review_parse_date), Locale.ROOT);
@@ -48,12 +58,30 @@ public class ReviewListActivity extends AppCompatActivity implements WriteReview
 
         Bundle extras = getIntent().getExtras();
         this.restroomID = extras.getInt("restroomID");
-        setTitle(extras.getString("restroomName"));
-        final double lat = extras.getDouble("restroomLat");
-        final double lng = extras.getDouble("restroomLng");
+        String restroomName = extras.getString("restroomName");
+        this.lat = extras.getDouble("restroomLat");
+        this.lng = extras.getDouble("restroomLng");
 
-        mReviewListAdapter = new ReviewListAdapter(this, lat, lng, new ArrayList<ReviewListAdapter.ReviewItem>());
+        ReviewListAdapter.ReviewHeader header = new ReviewListAdapter.ReviewHeader();
+        header.title = restroomName;
+        mReviewListAdapter = new ReviewListAdapter(this, lat, lng, header, new ArrayList<ReviewListAdapter.ReviewItem>());
 
+        this.mapUtil = new MapUtility(this);
+        mapUtil.setupMapFragment(new AppBarLayout.OnOffsetChangedListener() {
+            private int mStatusBarHeight;
+
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                // Calculate status bar height if frame insets are supported (Kitkat+)
+                if(Build.VERSION.SDK_INT >= 19 && mStatusBarHeight <= 0) {
+                    Rect displayRect = new Rect();
+                    getWindow().getDecorView().getWindowVisibleDisplayFrame(displayRect);
+                    mStatusBarHeight = displayRect.top;
+                }
+            }
+        });
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initReviewListAdapter();
         loadRestrooms();
     }
@@ -85,6 +113,45 @@ public class ReviewListActivity extends AppCompatActivity implements WriteReview
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         reviewListView.setLayoutManager(llm);
         reviewListView.setAdapter(mReviewListAdapter);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        mMap.getUiSettings().setAllGesturesEnabled(false);
+
+        // Center map on user's location before placing map pins
+        LatLng pos = mapUtil.getUserLatLng();
+        if(pos != null && mMap != null) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 15.5f));
+        }
+
+        placeMapPin(new LatLng(lat, lng));
+    }
+
+    private void placeMapPin(LatLng pos) {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        mMap.clear();
+
+        BitmapDescriptor icon = mapUtil.getPinIcon();
+
+        MarkerOptions marker = new MarkerOptions()
+                .position(pos)
+                .title(getTitle().toString())
+                .icon(icon);
+        mMap.addMarker(marker);
+        builder.include(pos);
+        builder.include(mapUtil.getUserLatLng());
+
+        try {
+            CameraUpdate update = CameraUpdateFactory.newLatLngBounds(builder.build(), 100);
+            mMap.animateCamera(update);
+        } catch(IllegalStateException e) {
+            // Location of point not found, should never happen!
+            Log.e("LATLNG", "Cannot find latitude/longitude!");
+        }
     }
 
     private class LoadReviewsTask extends AsyncTask<Integer, Void, Void> {

@@ -1,15 +1,14 @@
 package cs354.plunjr;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.RatingBar;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -25,10 +24,10 @@ public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private final Activity context;
 
     public ReviewListAdapter(Activity context, double lat, double lng, List<ReviewListAdapter.ReviewItem> reviews) {
-        this(context, lat, lng, reviews, new ReviewHeader());
+        this(context, lat, lng, new ReviewHeader(), reviews);
     }
 
-    public ReviewListAdapter(Activity context, double lat, double lng, List<ReviewListAdapter.ReviewItem> reviews, ReviewHeader header) {
+    public ReviewListAdapter(Activity context, double lat, double lng, ReviewHeader header, List<ReviewItem> reviews) {
         reviews.add(0, header);
         this.context = context;
         this.reviews = reviews;
@@ -95,6 +94,8 @@ public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ReviewHeaderViewHolder item = (ReviewHeaderViewHolder) holder;
             final ReviewHeader header = (ReviewHeader) reviews.get(position);
 
+            item.title.setText(header.title);
+
             item.rb.setOnRatingChangeListener(new com.whinc.widget.ratingbar.RatingBar.OnRatingChangeListener() {
                 @Override
                 public void onChange(com.whinc.widget.ratingbar.RatingBar ratingBar, int preCount, int curCount) {
@@ -121,10 +122,12 @@ public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         protected LinearLayout header;
         protected com.whinc.widget.ratingbar.RatingBar rb;
+        protected TextView title;
 
         public ReviewHeaderViewHolder(View v) {
             super(v);
             this.header = (LinearLayout) v.findViewById(R.id.reviewListHeader);
+            this.title = (TextView) v.findViewById(R.id.title);
             this.rb = (com.whinc.widget.ratingbar.RatingBar)
                     header.findViewById(R.id.newRating);
         }
@@ -162,5 +165,6 @@ public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public static class ReviewHeader implements ReviewItem {
+        protected String title;
     }
 }

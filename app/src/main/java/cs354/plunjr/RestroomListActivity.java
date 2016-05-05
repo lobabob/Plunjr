@@ -1,12 +1,8 @@
 package cs354.plunjr;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,19 +11,14 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -37,8 +28,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -61,6 +51,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private WriteReviewDialogFragment mDialog;
     private GoogleMap mMap;
+    private MapUtility mapUtil;
 
 
     @Override
@@ -68,29 +59,11 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restroom_list);
 
-        // Begin map initialization
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        // Recalculate map height to be a percentage of the viewport height
-        ViewGroup.LayoutParams mapParams = mapFragment.getView().getLayoutParams();
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        mapParams.height = (int) (metrics.heightPixels * MAP_FRAGMENT_VH);
-        mapFragment.getView().setLayoutParams(mapParams);
-
-        // Set up toolbar
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
-        toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.colorWhite));
-
         final CollapsingToolbarLayout ctl = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbar);
-        ctl.setTitleEnabled(false);
 
-        // Fade toolbar in/out on scroll
-        final AppBarLayout appBar = (AppBarLayout) findViewById(R.id.appbar);
-        appBar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+        this.mapUtil = new MapUtility(this);
+        mapUtil.setupMapFragment(new AppBarLayout.OnOffsetChangedListener() {
             private int mStatusBarHeight;
 
             @Override
@@ -112,6 +85,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
                 }
             }
         });
+
         // Refresh restroom list on swipe gesture
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.restroomListSwipeRefresh);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -156,7 +130,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
         // Center map on user's location before placing map pins
-        LatLng myPosition = getUserLatLng();
+        LatLng myPosition = mapUtil.getUserLatLng();
         if(myPosition != null && mMap != null) {
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 15.5f));
         }
@@ -182,29 +156,12 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
     @Override
     public void onDialogNegativeClick() {}
 
-    private LatLng getUserLatLng() {
-        LatLng myPosition = null;
-
-        // Get user location
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        String provider = locationManager.getBestProvider(new Criteria(), true);
-        Location location = locationManager.getLastKnownLocation(provider);
-
-        if(location != null) {
-            myPosition = new LatLng(location.getLatitude(), location.getLongitude());
-        }
-        return myPosition;
-    }
-
     private void placeMapPins() {
         if(mAsyncTaskCounter.decrementAndGet() <= 0 && mRestroomListAdapter.getItemCount() > 0) {
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             mMap.clear();
 
-            // Scale plunger icon
-            int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAP_MARKER_SIZE_DP, getResources().getDisplayMetrics());
-            Bitmap icon = ((BitmapDrawable) ResourcesCompat.getDrawable(getResources(), R.drawable.plunger, null)).getBitmap();
-            Bitmap scaledIcon = Bitmap.createScaledBitmap(icon, px, px, false);
+            BitmapDescriptor icon = mapUtil.getPinIcon();
 
             // Place map pins
             for(int i = 0; i < mRestroomListAdapter.getItemCount(); i++) {
@@ -212,7 +169,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
                 MarkerOptions marker = new MarkerOptions()
                         .position(rrInfo.latLng)
                         .title(rrInfo.name)
-                        .icon(BitmapDescriptorFactory.fromBitmap(scaledIcon));
+                        .icon(icon);
                 mMap.addMarker(marker);
                 builder.include(rrInfo.latLng);
             }
@@ -258,7 +215,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         protected Void doInBackground(Context... params) {
             try {
                 mRestroomListAdapter.clear();
-                LatLng myPos = getUserLatLng();
+                LatLng myPos = mapUtil.getUserLatLng();
                 if(myPos != null) {
                     JSONArray restrooms = new PlunjrAPIClient().getRestrooms(params[0], myPos.latitude, myPos.longitude);
 
