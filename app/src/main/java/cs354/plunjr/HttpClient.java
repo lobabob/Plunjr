@@ -35,7 +35,7 @@ public abstract class HttpClient {
         return res;
     }
 
-    String get(URL url) {
+    private String get(URL url) {
         String res = "[]";
         try {
             // Open connection and prepare to receive response
@@ -78,7 +78,7 @@ public abstract class HttpClient {
         return res;
     }
 
-    String post(URL url, String postData) {
+    private String post(URL url, String postData) {
         String res = null;
         try {
             // Open connection and prepare to send postData
