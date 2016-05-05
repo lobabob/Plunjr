@@ -1,15 +1,11 @@
 package cs354.plunjr;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 
 /**
@@ -22,48 +18,34 @@ public class PlunjrAPIClient extends HttpClient {
     private static final String LOG_TAG = "Plunjr_Client";
 
     public JSONArray getRestrooms(Context context, double lat, double lng) {
-        // Make GET request to API
-        String res = "";
+        String res = getFromURL(String.format(context.getString(R.string.get_restrooms_uri), lat, lng));
+
+        JSONArray resArr = new JSONArray();
         try {
-            URL url = new URL(String.format(context.getString(R.string.get_restrooms_uri), lat, lng));
-            res = get(url);
-        } catch(MalformedURLException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-        }
-        // Convert response to JSON array
-        JSONArray arr = new JSONArray();
-        try {
-            arr = new JSONArray(res);
+            resArr = new JSONArray(res);
         } catch(JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
-        return arr;
+        return resArr;
     }
 
     public JSONArray getReviews(Context context, int restroomID) {
-        String res = "";
+        String res = getFromURL(String.format(context.getString(R.string.get_reviews_uri), restroomID));
+
+        JSONArray resArr = new JSONArray();
         try {
-            URL url = new URL(String.format(context.getString(R.string.get_reviews_uri), restroomID));
-            res = get(url);
-        } catch(Exception e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-        }
-        // Convert response to JSON array
-        JSONArray arr = new JSONArray();
-        try {
-            arr = new JSONArray(res);
+            resArr = new JSONArray(res);
         } catch(JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
-        return arr;
+        return resArr;
     }
 
     public JSONObject postReview(Context context, String address, String user, String rating,
                                 String title, String description, String name, String lat, String lng) {
-        String res = "";
         JSONObject resObj = new JSONObject();
 
-        // Transform parameters into a correctly formatted string
+        // Transform parameters into a correctly formatted JSON string
         JSONObject obj = new JSONObject();
         try {
             obj.put("address", address);
@@ -77,15 +59,8 @@ public class PlunjrAPIClient extends HttpClient {
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
-        String postData = obj.toString();
+        String res = postJSONToURL(obj, context.getString(R.string.post_review_uri));
 
-        // Make POST request to API
-        try {
-            URL url = new URL(context.getString(R.string.post_review_uri));
-            res = post(url, postData);
-        } catch(MalformedURLException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-        }
         // Convert response to JSON array
         try {
             resObj = new JSONObject(res);
@@ -95,29 +70,21 @@ public class PlunjrAPIClient extends HttpClient {
         return resObj;
     }
 
-    public JSONObject postImage(Context context, String imgUrl, int id) {
-        String res = "";
-        JSONObject resObj = new JSONObject();
+    public JSONObject postImageURL(Context context, String imgUrl, int id) {
+        JSONObject resObj = null;
 
         // Transform parameters into a correctly formatted string
-        JSONArray arr = new JSONArray();
+        JSONArray req = new JSONArray();
         try {
             JSONObject obj = new JSONObject();
             obj.put("imageUrl", imgUrl);
-            arr.put(obj);
+            req.put(obj);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
-        String postData = arr.toString();
+        String res = postJSONToURL(req, String.format(context.getString(R.string.patch_photo_uri), id));
 
-        // Make POST request to API
-        try {
-            URL url = new URL(String.format(context.getString(R.string.patch_photo_uri), id));
-            res = post(url, postData);
-        } catch(MalformedURLException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-        }
-        // Convert response to JSON array
+        // Convert response to JSON object
         try {
             resObj = new JSONObject(res);
         } catch(JSONException e) {
