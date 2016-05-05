@@ -2,12 +2,15 @@ package cs354.plunjr;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import java.util.List;
@@ -76,7 +79,7 @@ public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             return new ReviewItemViewHolder(inflater.inflate(R.layout.review_item, parent, false));
         }
 
-        return new ReviewHeaderViewHolder(inflater.inflate(R.layout.review_header, parent, false));
+        return new ReviewHeaderViewHolder(inflater.inflate(R.layout.review_header, parent, false), context);
     }
 
     @Override
@@ -96,10 +99,23 @@ public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             item.title.setText(header.title);
 
+            if (header.imgUrls.length == 0) {
+                item.imgGallery.setVisibility(View.GONE);
+            } else {
+                item.imgGallery.setVisibility(View.VISIBLE);
+            }
+
+            // item.imgGallery.setAdapter();  TODO Set adapter for imgGallery before populating it
+
+            // TODO Add in images here
+            // Access relevant image urls from header.imgUrls <- that is a string[]
+            // Add ImageViews to item.imgGallery for each image
+            // Each image should have height: 'match_parent' and width: 'wrap_content'
+
             item.rb.setOnRatingChangeListener(new com.whinc.widget.ratingbar.RatingBar.OnRatingChangeListener() {
                 @Override
                 public void onChange(com.whinc.widget.ratingbar.RatingBar ratingBar, int preCount, int curCount) {
-                    if (curCount > 0) {
+                    if (curCount > 0 && !mDialog.isAdded()) {
                         Bundle args = new Bundle();
                         args.putInt("rating", curCount);
                         args.putDouble("lat", lat);
@@ -123,13 +139,21 @@ public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         protected LinearLayout header;
         protected com.whinc.widget.ratingbar.RatingBar rb;
         protected TextView title;
+        protected RecyclerView imgGallery;
 
-        public ReviewHeaderViewHolder(View v) {
+        public ReviewHeaderViewHolder(View v, Activity context) {
             super(v);
             this.header = (LinearLayout) v.findViewById(R.id.reviewListHeader);
             this.title = (TextView) v.findViewById(R.id.title);
             this.rb = (com.whinc.widget.ratingbar.RatingBar)
                     header.findViewById(R.id.newRating);
+
+            this.imgGallery = (RecyclerView) v.findViewById(R.id.imageGallery);
+            this.imgGallery.setHasFixedSize(false);
+
+            LinearLayoutManager llm = new LinearLayoutManager(context);
+            llm.setOrientation(LinearLayoutManager.HORIZONTAL);
+            imgGallery.setLayoutManager(llm);
         }
     }
 
@@ -166,5 +190,6 @@ public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     public static class ReviewHeader implements ReviewItem {
         protected String title;
+        protected String[] imgUrls;
     }
 }
