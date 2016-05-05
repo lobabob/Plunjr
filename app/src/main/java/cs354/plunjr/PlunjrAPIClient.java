@@ -1,6 +1,7 @@
 package cs354.plunjr;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -81,6 +82,37 @@ public class PlunjrAPIClient extends HttpClient {
         // Make POST request to API
         try {
             URL url = new URL(context.getString(R.string.post_review_uri));
+            res = post(url, postData);
+        } catch(MalformedURLException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+        }
+        // Convert response to JSON array
+        try {
+            resObj = new JSONObject(res);
+        } catch(JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+        }
+        return resObj;
+    }
+
+    public JSONObject postImage(Context context, String imgUrl, int id) {
+        String res = "";
+        JSONObject resObj = new JSONObject();
+
+        // Transform parameters into a correctly formatted string
+        JSONArray arr = new JSONArray();
+        try {
+            JSONObject obj = new JSONObject();
+            obj.put("imageUrl", imgUrl);
+            arr.put(obj);
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+        }
+        String postData = arr.toString();
+
+        // Make POST request to API
+        try {
+            URL url = new URL(String.format(context.getString(R.string.patch_photo_uri), id));
             res = post(url, postData);
         } catch(MalformedURLException e) {
             Log.e(LOG_TAG, e.getMessage(), e);

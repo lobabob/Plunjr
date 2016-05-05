@@ -1,11 +1,14 @@
 package cs354.plunjr;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,12 +20,12 @@ public class ImgurAPIClient extends HttpClient {
 
     @Override
     void setGetHeaders(HttpURLConnection connection) {
-        connection.setRequestProperty("Authentication", "Client-ID ceb4ee981a06089");
+        connection.setRequestProperty("Authorization", "Client-ID ceb4ee981a06089");
     }
 
     @Override
     void setPostHeaders(HttpURLConnection connection) {
-        connection.setRequestProperty("Authentication", "Client-ID ceb4ee981a06089");
+        connection.setRequestProperty("Authorization", "Client-ID ceb4ee981a06089");
     }
 
     public String getImageURLFromID(Context context, String id) {
@@ -45,14 +48,20 @@ public class ImgurAPIClient extends HttpClient {
         return link;
     }
 
-    public String uploadImage(Context context, Byte[] imgData) {
+    public String uploadImage(Context context, Bitmap img) {
         String res = "";
         JSONObject resObj = new JSONObject();
+
+        // Convert bitmap to byte array
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        img.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        String imgData = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
 
         // Transform parameters into a correctly formatted string
         JSONObject obj = new JSONObject();
         try {
             obj.put("image", imgData);
+            obj.put("key", context.getString(R.string.imgur_client_id));
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
@@ -60,7 +69,7 @@ public class ImgurAPIClient extends HttpClient {
 
         // Make POST request to API
         try {
-            URL url = new URL(context.getString(R.string.post_review_uri));
+            URL url = new URL(context.getString(R.string.imgur_post_uri));
             res = post(url, postData);
         } catch(MalformedURLException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
@@ -71,7 +80,7 @@ public class ImgurAPIClient extends HttpClient {
         } catch(JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
-        return resObj.optString("data");
+        return resObj.optJSONObject("data").optString("link");
     }
 
 }
