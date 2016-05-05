@@ -145,6 +145,8 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
         public int compare(RestroomInfo lhs, RestroomInfo rhs) {
             if(lhs.distance > rhs.distance) {
                 return 1;
+            } else if(lhs.distance == rhs.distance) {
+                return 0;
             } else {
                 return -1;
             }
@@ -160,6 +162,8 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
         public int compare(RestroomInfo lhs, RestroomInfo rhs) {
             if(lhs.rating < rhs.rating) {
                 return 1;
+            } else if(lhs.rating == rhs.rating) {
+                return 0;
             } else {
                 return -1;
             }
