@@ -13,6 +13,7 @@ import android.widget.RatingBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -77,9 +78,9 @@ public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         if (viewType == TYPE_ITEM) {
             return new ReviewItemViewHolder(inflater.inflate(R.layout.review_item, parent, false));
+        } else {
+            return new ReviewHeaderViewHolder(inflater.inflate(R.layout.review_header, parent, false), context);
         }
-
-        return new ReviewHeaderViewHolder(inflater.inflate(R.layout.review_header, parent, false), context);
     }
 
     @Override
@@ -100,17 +101,24 @@ public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             item.title.setText(header.title);
 
             if (header.imgUrls.length == 0) {
-                item.imgGallery.setVisibility(View.GONE);
+                //item.imgGallery.setVisibility(View.GONE);
             } else {
-                item.imgGallery.setVisibility(View.VISIBLE);
+                //item.imgGallery.setVisibility(View.VISIBLE);
             }
-
-            // item.imgGallery.setAdapter();  TODO Set adapter for imgGallery before populating it
+            RecyclerView imgGallery = item.imgGallery;
+            imgGallery.setHasFixedSize(true);
+            LinearLayoutManager llm = new LinearLayoutManager(imgGallery.getContext());
+            llm.setOrientation(LinearLayoutManager.HORIZONTAL);
+            imgGallery.setLayoutManager(llm);
+            List<String> list = new ArrayList<>();
+            ImageGalleryAdapter a = new ImageGalleryAdapter(list);
+            imgGallery.setAdapter(a);
 
             // TODO Add in images here
             // Access relevant image urls from header.imgUrls <- that is a string[]
-            // Add ImageViews to item.imgGallery for each image
-            // Each image should have height: 'match_parent' and width: 'wrap_content'
+            list.add("http://vignette2.wikia.nocookie.net/runescape2/images/1/14/Old_School_HUD.png");
+            list.add("http://services.runescape.com/m=rswikiimages/en/2013/2/2007_login_screen-21171343.jpg");
+            list.add("http://www.mmogames.com/wp-content/uploads/2013/11/130428144905.png");
 
             item.rb.setOnRatingChangeListener(new com.whinc.widget.ratingbar.RatingBar.OnRatingChangeListener() {
                 @Override
