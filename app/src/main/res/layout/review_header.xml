@@ -22,7 +22,22 @@
         android:layout_width="match_parent"
         android:scrollbars="none"/>
 
-    <!-- Rating -->
+    <!-- Add Photo Button -->
+    <ImageButton
+        android:id="@+id/addPhotoButton"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:src="@drawable/ic_add_photo"/>
+
+    <!-- Rating Bar -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/rate_this_restroom"/>
+
     <com.whinc.widget.ratingbar.RatingBar
         android:id="@+id/newRating"
         android:layout_width="match_parent"
@@ -32,8 +47,17 @@
         android:numStars="5"
         app:rb_max_count="5"
         app:rb_click_rating="true"
-        app:rb_empty="@drawable/ic_star_border_36dp"
-        app:rb_fill="@drawable/ic_star_fill_36dp" />
+        app:rb_empty="@drawable/ic_star_empty"
+        app:rb_fill="@drawable/ic_star_fill" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginBottom="10dp"
+        android:textStyle="italic"
+        android:textSize="11dp"
+        android:text="@string/review_disclaimer"/>
 
     <View
         android:layout_width="fill_parent"
