@@ -173,6 +173,9 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
                 mMap.addMarker(marker);
                 builder.include(rrInfo.latLng);
             }
+
+            builder.include(mapUtil.getUserLatLng());
+
             try {
                 CameraUpdate update = CameraUpdateFactory.newLatLngBounds(builder.build(), 10);
                 mMap.animateCamera(update);
@@ -217,6 +220,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
                 mRestroomListAdapter.clear();
                 LatLng myPos = mapUtil.getUserLatLng();
                 if(myPos != null) {
+//                    JSONArray restrooms = new JSONArray(getResources().getString(R.string.debug_restroom_json));
                     JSONArray restrooms = new PlunjrAPIClient().getRestrooms(params[0], myPos.latitude, myPos.longitude);
 
                     for (int i = 0; i < restrooms.length(); i++) {
