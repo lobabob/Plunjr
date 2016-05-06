@@ -43,8 +43,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class RestroomListActivity extends AppCompatActivity implements OnMapReadyCallback, WriteReviewDialogFragment.WriteReviewDialogListener {
 
     private static final double METERS_PER_MILE = 1609.344;
-    private static final double MAP_FRAGMENT_VH = 0.4;
-    private static final int MAP_MARKER_SIZE_DP = 60;
     private static AtomicInteger mAsyncTaskCounter = new AtomicInteger(2);
 
     private RestroomListAdapter mRestroomListAdapter;
@@ -85,7 +83,6 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
                 }
             }
         });
-
         // Refresh restroom list on swipe gesture
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.restroomListSwipeRefresh);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

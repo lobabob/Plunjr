@@ -21,7 +21,7 @@ public class ImgurAPIClient extends HttpClient {
     }
 
     @Override
-    void setPostHeaders(HttpURLConnection conn) {
+    protected void setPostHeaders(HttpURLConnection conn) {
         conn.setRequestProperty("Authorization", "Client-ID " + mContext.getString(R.string.imgur_client_id));
     }
 

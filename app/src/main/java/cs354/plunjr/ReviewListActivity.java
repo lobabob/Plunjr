@@ -267,7 +267,7 @@ public class ReviewListActivity extends AppCompatActivity implements OnMapReadyC
 
         @Override
         protected Void doInBackground(String... params) {
-            new PlunjrAPIClient().postImageURL(mContext, params[0], restroomID);
+            new PlunjrAPIClient().addImages(mContext, params[0], restroomID);
             return null;
         }
     }

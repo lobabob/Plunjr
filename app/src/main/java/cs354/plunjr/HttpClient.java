@@ -2,7 +2,6 @@ package cs354.plunjr;
 
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -18,13 +17,15 @@ import java.net.URL;
 public abstract class HttpClient {
 
     private static final String LOG_TAG = "HTTP_Client";
+    private static final String METHOD_POST  = "POST";
+    private static final String METHOD_PATCH = "PATCH";
 
 
     // Can be overridden by child classes to set custom headers
-    void setPostHeaders(HttpURLConnection conn) {}
-    void setGetHeaders(HttpURLConnection conn)  {}
+    protected void setPostHeaders(HttpURLConnection conn) {}
+    protected void setGetHeaders(HttpURLConnection conn)  {}
 
-    String getFromURL(String urlString) {
+    protected String getFromURL(String urlString) {
         String res = null;
         try {
             URL url = new URL(urlString);
@@ -59,7 +60,7 @@ public abstract class HttpClient {
         return res;
     }
 
-    String postJSONToURL(JSONObject req, String urlString) {
+    protected String postJSONToURL(JSONObject req, String urlString) {
         String res = null;
         try {
             URL url = new URL(urlString);
@@ -70,7 +71,7 @@ public abstract class HttpClient {
         return res;
     }
 
-    String patchJSONToURL(JSONObject req, String urlString) {
+    protected String patchJSONToURL(JSONObject req, String urlString) {
         String res = null;
         try {
             URL url = new URL(urlString);
@@ -82,11 +83,11 @@ public abstract class HttpClient {
     }
 
     private String patch(URL url, String postData) {
-        return sendAndReceive(url, postData, "PATCH");
+        return sendAndReceive(url, postData, METHOD_PATCH);
     }
 
     private String post(URL url, String postData) {
-        return sendAndReceive(url, postData, "POST");
+        return sendAndReceive(url, postData, METHOD_POST);
     }
 
     private String sendAndReceive(URL url, String postData, String requestMethod) {

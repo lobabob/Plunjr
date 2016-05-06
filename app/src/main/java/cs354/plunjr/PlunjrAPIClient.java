@@ -1,7 +1,6 @@
 package cs354.plunjr;
 
 import android.content.Context;
-import android.renderscript.Double2;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -71,7 +70,7 @@ public class PlunjrAPIClient extends HttpClient {
         return resObj;
     }
 
-    public JSONObject postImageURL(Context context, String imgUrl, int id) {
+    public JSONObject addImages(Context context, String imgUrl, int restroomID) {
         JSONObject resObj = null;
 
         // Transform parameters into a correctly formatted string
@@ -83,7 +82,7 @@ public class PlunjrAPIClient extends HttpClient {
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
-        String res = patchJSONToURL(req, String.format(context.getString(R.string.patch_photo_uri), id));
+        String res = patchJSONToURL(req, String.format(context.getString(R.string.patch_photo_uri), restroomID));
 
         // Convert response to JSON object
         if(res != null) {
