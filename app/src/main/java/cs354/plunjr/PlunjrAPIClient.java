@@ -75,21 +75,23 @@ public class PlunjrAPIClient extends HttpClient {
         JSONObject resObj = null;
 
         // Transform parameters into a correctly formatted string
-        JSONArray req = new JSONArray();
+        JSONObject req = new JSONObject();
         try {
-            JSONObject obj = new JSONObject();
-            obj.put("imageUrl", imgUrl);
-            req.put(obj);
+            JSONArray urlsArr = new JSONArray();
+            urlsArr.put(imgUrl);
+            req.put("imagesUrl", urlsArr);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
-        String res = postJSONToURL(req, String.format(context.getString(R.string.patch_photo_uri), id));
+        String res = patchJSONToURL(req, String.format(context.getString(R.string.patch_photo_uri), id));
 
         // Convert response to JSON object
-        try {
-            resObj = new JSONObject(res);
-        } catch(JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
+        if(res != null) {
+            try {
+                resObj = new JSONObject(res);
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+            }
         }
         return resObj;
     }

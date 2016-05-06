@@ -1,6 +1,10 @@
 package cs354.plunjr;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,10 +12,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -134,6 +140,15 @@ public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     }
                 }
             });
+            // Set up "Add Photo" button
+            item.addPhotoButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    intent.setType("image/*");
+                    context.startActivityForResult(Intent.createChooser(intent, "Select a restroom photo"), 0);
+                }
+            });
         }
     }
 
@@ -148,6 +163,7 @@ public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         protected com.whinc.widget.ratingbar.RatingBar rb;
         protected TextView title;
         protected RecyclerView imgGallery;
+        protected ImageButton addPhotoButton;
 
         public ReviewHeaderViewHolder(View v, Activity context) {
             super(v);
@@ -158,6 +174,7 @@ public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             this.imgGallery = (RecyclerView) v.findViewById(R.id.imageGallery);
             this.imgGallery.setHasFixedSize(false);
+            this.addPhotoButton = (ImageButton) v.findViewById(R.id.addPhotoButton);
 
             LinearLayoutManager llm = new LinearLayoutManager(context);
             llm.setOrientation(LinearLayoutManager.HORIZONTAL);

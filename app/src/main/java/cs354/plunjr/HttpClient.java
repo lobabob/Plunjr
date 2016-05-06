@@ -60,32 +60,43 @@ public abstract class HttpClient {
     }
 
     String postJSONToURL(JSONObject req, String urlString) {
-        return postJSONToURL(req.toString(), urlString);
-    }
-
-    String postJSONToURL(JSONArray req, String urlString) {
-        return postJSONToURL(req.toString(), urlString);
-    }
-
-    String postJSONToURL(String jsonString, String urlString) {
         String res = null;
         try {
             URL url = new URL(urlString);
-            res = post(url, jsonString);
+            res = post(url, req.toString());
         } catch(MalformedURLException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
         return res;
     }
 
+    String patchJSONToURL(JSONObject req, String urlString) {
+        String res = null;
+        try {
+            URL url = new URL(urlString);
+            res = patch(url, req.toString());
+        } catch(MalformedURLException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+        }
+        return res;
+    }
+
+    private String patch(URL url, String postData) {
+        return sendAndReceive(url, postData, "PATCH");
+    }
+
     private String post(URL url, String postData) {
+        return sendAndReceive(url, postData, "POST");
+    }
+
+    private String sendAndReceive(URL url, String postData, String requestMethod) {
         String res = null;
         try {
             // Open connection and prepare to send postData
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod(requestMethod);
             conn.setDoOutput(true);
             conn.setDoInput(true);
-            conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestProperty("charset", "utf-8");
             conn.setRequestProperty("Content-Length", Integer.toString(postData.length()));

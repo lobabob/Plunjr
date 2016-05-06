@@ -1,15 +1,21 @@
 package cs354.plunjr;
 
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -24,19 +30,19 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 public class ReviewListActivity extends AppCompatActivity implements OnMapReadyCallback, WriteReviewDialogFragment.WriteReviewDialogListener {
 
     private static final double MAP_FRAGMENT_VH = 0.4;
     private static final int MAP_MARKER_SIZE_DP = 60;
+    private static final int SELECT_PHOTO = 0;
 
     private DateFormat parseDatePattern;
     private DateFormat formatDatePattern;
@@ -162,6 +168,26 @@ public class ReviewListActivity extends AppCompatActivity implements OnMapReadyC
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == SELECT_PHOTO) {
+            if (resultCode == RESULT_OK) {
+                try {
+                    Uri imageUri = data.getData();
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 500, 500, false);
+                    new UploadImageToImgurTask(this).execute(bitmap);
+                } catch(IOException e) {
+                    Toast.makeText(this, "Upload Failed", Toast.LENGTH_SHORT).show();
+                    Log.e("IMGUR UPLOAD", e.getMessage(), e);
+                }
+            } else if (resultCode == RESULT_CANCELED) {
+                // Do nothing
+            }
+        }
+    }
+
     private class LoadReviewsTask extends AsyncTask<Integer, Void, Void> {
 
         @Override
@@ -204,6 +230,45 @@ public class ReviewListActivity extends AppCompatActivity implements OnMapReadyC
         @Override
         protected void onPostExecute(Void result) {
             mReviewListAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private class UploadImageToImgurTask extends AsyncTask<Bitmap, Void, String> {
+
+        private Context mContext;
+
+        public UploadImageToImgurTask(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        protected String doInBackground(Bitmap... params) {
+            return new ImgurAPIClient(mContext).uploadImage(params[0]);
+        }
+
+        @Override
+        protected void onPostExecute(String res) {
+            if(res != null) {
+                Toast.makeText(mContext, "Upload Succeeded!", Toast.LENGTH_SHORT).show();
+                new AddImageUrlsToRestroomTask(mContext).execute(res);
+            } else {
+                Toast.makeText(mContext, "Upload Failed", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private class AddImageUrlsToRestroomTask extends AsyncTask<String, Void, Void> {
+
+        private Context mContext;
+
+        public AddImageUrlsToRestroomTask(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+            new PlunjrAPIClient().postImageURL(mContext, params[0], restroomID);
+            return null;
         }
     }
 }
