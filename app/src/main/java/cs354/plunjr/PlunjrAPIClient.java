@@ -1,6 +1,7 @@
 package cs354.plunjr;
 
 import android.content.Context;
+import android.renderscript.Double2;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -54,8 +55,8 @@ public class PlunjrAPIClient extends HttpClient {
             obj.put("title", title);
             obj.put("description", description);
             obj.put("name", name);
-            obj.put("lat", Float.parseFloat(lat));
-            obj.put("lng", Float.parseFloat(lng));
+            obj.put("lat", Double.parseDouble(lat));
+            obj.put("lng", Double.parseDouble(lng));
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
