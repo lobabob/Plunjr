@@ -8,10 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.squareup.picasso.Picasso;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -49,6 +51,15 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
         );
         rrHolder.distance.setText(String.format(Locale.US, "%.1f mi", rr.distance));
 
+        if(rr.imgUrls != null && rr.imgUrls.length > 0) {
+            Picasso.with(rrHolder.itemView.getContext())
+                    .load(rr.imgUrls[0])
+                    .fit()
+                    .centerCrop()
+                    .placeholder(R.drawable.placeholder)
+                    .into(rrHolder.img);
+        }
+
         // Set holder on click listener
         rrHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,11 +69,13 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
                 intent.putExtra("restroomName", rr.name);
                 intent.putExtra("restroomLat", rr.latLng.latitude);
                 intent.putExtra("restroomLng", rr.latLng.longitude);
+                intent.putExtra("imgUrls", rr.imgUrls);
+
                 view.getContext().startActivity(intent);
             }
         });
         // Set directions button on click listener
-        rrHolder.directionsButton.setOnClickListener(new View.OnClickListener() {
+        rrHolder.getDirections.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Context context = rrHolder.itemView.getContext();
@@ -113,16 +126,18 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
         protected TextView distance;
         protected TextView reviewCount;
         protected RatingBar rating;
-        protected ImageButton directionsButton;
+        protected ImageView img;
+        protected ImageButton getDirections;
 
         public RestroomViewHolder(View v) {
             super(v);
-            name = (TextView) v.findViewById(R.id.listRowTitle);
-            address = (TextView) v.findViewById(R.id.listRowAddress);
-            distance = (TextView) v.findViewById(R.id.listRowDistance);
-            reviewCount = (TextView) v.findViewById(R.id.listRowReviewCount);
-            rating = (RatingBar) v.findViewById(R.id.listRowRatingBar);
-            directionsButton = (ImageButton) v.findViewById(R.id.listRowDirectionsButton);
+            name          = (TextView)    v.findViewById(R.id.listRowTitle);
+            address       = (TextView)    v.findViewById(R.id.listRowAddress);
+            distance      = (TextView)    v.findViewById(R.id.listRowDistance);
+            reviewCount   = (TextView)    v.findViewById(R.id.listRowReviewCount);
+            rating        = (RatingBar)   v.findViewById(R.id.listRowRatingBar);
+            img           = (ImageView)   v.findViewById(R.id.listRowImage);
+            getDirections = (ImageButton) v.findViewById(R.id.listRowDirectionsButton);
         }
     }
 
@@ -134,6 +149,7 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
         protected float rating;
         protected LatLng latLng;
         protected int id;
+        protected String[] imgUrls;
     }
 
     /**

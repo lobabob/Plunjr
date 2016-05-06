@@ -233,6 +233,14 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
                         rrInfo.reviewCount = restroom.optInt("reviewCount");
                         rrInfo.id = restroom.optInt("id");
 
+                        JSONArray imgUrlsJSON = restroom.optJSONArray("imagesUrl");
+                        if(imgUrlsJSON != null) {
+                            String[] imgUrls = new String[imgUrlsJSON.length()];
+                            for(int j = 0; j < imgUrlsJSON.length(); j++) {
+                                imgUrls[j] = imgUrlsJSON.get(j).toString();
+                            }
+                            rrInfo.imgUrls = imgUrls;
+                        }
                         mRestroomListAdapter.add(rrInfo);
                     }
                 }

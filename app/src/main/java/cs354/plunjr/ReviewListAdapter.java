@@ -97,9 +97,9 @@ public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             item.title.setText(header.title);
 
             if (header.imgUrls.length == 0) {
-                //item.imgGallery.setVisibility(View.GONE);
+                item.imgGallery.setVisibility(View.GONE);
             } else {
-                //item.imgGallery.setVisibility(View.VISIBLE);
+                item.imgGallery.setVisibility(View.VISIBLE);
             }
             RecyclerView imgGallery = item.imgGallery;
             imgGallery.setHasFixedSize(true);
@@ -110,11 +110,9 @@ public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ImageGalleryAdapter a = new ImageGalleryAdapter(list);
             imgGallery.setAdapter(a);
 
-            // TODO Add in images here
-            list.add("http://vignette2.wikia.nocookie.net/runescape2/images/1/14/Old_School_HUD.png");
-            list.add("http://services.runescape.com/m=rswikiimages/en/2013/2/2007_login_screen-21171343.jpg");
-            list.add("http://www.mmogames.com/wp-content/uploads/2013/11/130428144905.png");
-
+            for(int i = 0; i < header.imgUrls.length; i++) {
+                list.add(header.imgUrls[i]);
+            }
             item.rb.setOnRatingChangeListener(new com.whinc.widget.ratingbar.RatingBar.OnRatingChangeListener() {
                 @Override
                 public void onChange(com.whinc.widget.ratingbar.RatingBar ratingBar, int preCount, int curCount) {

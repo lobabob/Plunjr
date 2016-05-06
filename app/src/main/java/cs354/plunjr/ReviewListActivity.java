@@ -40,8 +40,6 @@ import java.util.Locale;
 
 public class ReviewListActivity extends AppCompatActivity implements OnMapReadyCallback, WriteReviewDialogFragment.WriteReviewDialogListener {
 
-    private static final double MAP_FRAGMENT_VH = 0.4;
-    private static final int MAP_MARKER_SIZE_DP = 60;
     private static final int SELECT_PHOTO = 0;
 
     private DateFormat parseDatePattern;
@@ -65,20 +63,19 @@ public class ReviewListActivity extends AppCompatActivity implements OnMapReadyC
                 getResources().getString(R.string.review_format_date), Locale.ROOT);
 
         Bundle extras = getIntent().getExtras();
-        this.restroomID = extras.getInt("restroomID");
+        this.restroomID     = extras.getInt("restroomID");
         String restroomName = extras.getString("restroomName");
-        this.lat = extras.getDouble("restroomLat");
-        this.lng = extras.getDouble("restroomLng");
-        String[] imgUrls = extras.getStringArray("imgUrls");
+        this.lat            = extras.getDouble("restroomLat");
+        this.lng            = extras.getDouble("restroomLng");
+        String[] imgUrls    = extras.getStringArray("imgUrls");
 
         if (imgUrls == null) {
             imgUrls = new String[0];
         }
-
-        ReviewListAdapter.ReviewHeader header = new ReviewListAdapter.ReviewHeader();
-        header.title = restroomName;
-        header.imgUrls = imgUrls;
-        mReviewListAdapter = new ReviewListAdapter(this, lat, lng, header, new ArrayList<ReviewListAdapter.ReviewItem>());
+        ReviewListAdapter.ReviewHeader headerInfo = new ReviewListAdapter.ReviewHeader();
+        headerInfo.title   = restroomName;
+        headerInfo.imgUrls = imgUrls;
+        mReviewListAdapter = new ReviewListAdapter(this, lat, lng, headerInfo, new ArrayList<ReviewListAdapter.ReviewItem>());
 
         this.mapUtil = new MapUtility(this);
         mapUtil.setupMapFragment(new AppBarLayout.OnOffsetChangedListener() {
@@ -94,28 +91,27 @@ public class ReviewListActivity extends AppCompatActivity implements OnMapReadyC
                 }
             }
         });
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initReviewListAdapter();
-        loadRestrooms();
+        loadReviews();
     }
 
-    private void loadRestrooms() {
+    private void loadReviews() {
         new LoadReviewsTask().execute(this.restroomID);
     }
 
     @Override
     public void onDialogPositiveClick() {
-        loadRestrooms();
+        loadReviews();
         onDialogNegativeClick();
     }
 
     @Override
     public void onDialogNegativeClick() {
         RecyclerView list = (RecyclerView) findViewById(R.id.reviewList);
-        LinearLayout header = (LinearLayout) list.findViewById(R.id.reviewListHeader);
+        LinearLayout headerView = (LinearLayout) list.findViewById(R.id.reviewListHeader);
 
-        ((com.whinc.widget.ratingbar.RatingBar) header.findViewById(R.id.newRating)).setCount(0);
+        ((com.whinc.widget.ratingbar.RatingBar) headerView.findViewById(R.id.newRating)).setCount(0);
     }
 
     private void initReviewListAdapter() {
