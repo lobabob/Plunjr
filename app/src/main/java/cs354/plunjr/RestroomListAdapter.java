@@ -58,6 +58,12 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
                     .centerCrop()
                     .placeholder(R.drawable.placeholder)
                     .into(rrHolder.img);
+        } else {
+            Picasso.with(rrHolder.itemView.getContext())
+                    .load(R.drawable.placeholder)
+                    .fit()
+                    .centerCrop()
+                    .into(rrHolder.img);
         }
 
         // Set holder on click listener
