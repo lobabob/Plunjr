@@ -56,6 +56,7 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
                     .load(rr.imgUrls[0])
                     .fit()
                     .centerCrop()
+                    .transform(new CircleTransform())
                     .placeholder(R.drawable.placeholder)
                     .into(rrHolder.img);
         } else {
@@ -63,6 +64,7 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
                     .load(R.drawable.placeholder)
                     .fit()
                     .centerCrop()
+                    .transform(new CircleTransform())
                     .into(rrHolder.img);
         }
 
