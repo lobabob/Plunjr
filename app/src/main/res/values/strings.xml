@@ -39,6 +39,19 @@
     <string name="imgur_client_id">ceb4ee981a06089</string>
 
     <!-- TODO: Remove when not needed -->
+    <string name="debug_restroom_json">
+        "[
+            {
+                \"lat\":30.2898680,
+                \"lng\":-97.7494450,
+                \"name\":\"Test Name\",
+                \"address\":\"Test Address\",
+                \"averageRating\":\"3.5\",
+                \"reviewCount\":\"4\",
+                \"id\":\"1\"
+            }
+        ]"
+    </string>
     <string name="debug_review_json">
         "[
             {
@@ -99,5 +112,4 @@
             }
         ]"
     </string>
-    <string name="title_activity_test">test</string>
 </resources>
