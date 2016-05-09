@@ -78,8 +78,7 @@ public class ReviewListActivity extends AppCompatActivity implements OnMapReadyC
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        initReviewListAdapter();
-        loadReviews();
+        initReviewList();
     }
 
     @Override
@@ -96,13 +95,14 @@ public class ReviewListActivity extends AppCompatActivity implements OnMapReadyC
         ((com.whinc.widget.ratingbar.RatingBar) headerView.findViewById(R.id.newRating)).setCount(0);
     }
 
-    private void initReviewListAdapter() {
+    private void initReviewList() {
         RecyclerView reviewListView = (RecyclerView) findViewById(R.id.reviewList);
         reviewListView.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         reviewListView.setLayoutManager(llm);
         reviewListView.setAdapter(mReviewListAdapter);
+        loadReviews();
     }
 
     private void loadReviews() {

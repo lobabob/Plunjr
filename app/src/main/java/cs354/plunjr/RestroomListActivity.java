@@ -186,7 +186,15 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
 
     private void loadRestrooms() {
         if(mRestroomListAdapter != null) {
-            mPlunjrClient.loadRestrooms(mRestroomListAdapter, new RestroomsLoadedCallable());
+            mPlunjrClient.loadRestrooms(mRestroomListAdapter, new Callable() {
+                @Override
+                public Object call() throws Exception {
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    sortRestrooms();
+                    placeMapPins();
+                    return null;
+                }
+            });
         } else {
             mRestroomListAdapter = new RestroomListAdapter(new ArrayList<RestroomListAdapter.RestroomInfo>());
             RecyclerView restroomListView = (RecyclerView) findViewById(R.id.restroomList);
@@ -196,20 +204,6 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
             restroomListView.setLayoutManager(llm);
             restroomListView.setAdapter(mRestroomListAdapter);
             loadRestrooms();
-        }
-    }
-
-    /**
-     * Should be called whenever the restroom list is successfully populated
-     */
-    private class RestroomsLoadedCallable implements Callable<Void> {
-
-        @Override
-        public Void call() throws Exception {
-            mSwipeRefreshLayout.setRefreshing(false);
-            sortRestrooms();
-            placeMapPins();
-            return null;
         }
     }
 }
