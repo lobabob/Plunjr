@@ -73,29 +73,12 @@ public class PlunjrAPIClient extends HttpClient {
         return resObj;
     }
 
-    public JSONObject addImages(String imgUrl, int restroomID) {
-        JSONObject resObj = null;
+    public void uploadImages(String imgUrl, int restroomID) {
+        new AddImageUrlsToRestroomTask(imgUrl, restroomID).execute();
+    }
 
-        // Transform parameters into a correctly formatted string
-        JSONObject req = new JSONObject();
-        try {
-            JSONArray urlsArr = new JSONArray();
-            urlsArr.put(imgUrl);
-            req.put("imagesUrl", urlsArr);
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-        }
-        String res = patchJSONToURL(req, String.format(mContext.getString(R.string.patch_photo_uri), restroomID));
-
-        // Convert response to JSON object
-        if(res != null) {
-            try {
-                resObj = new JSONObject(res);
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-            }
-        }
-        return resObj;
+    public void uploadImages(String imgUrl, int restroomID, Callable onTaskCompleteCallback) {
+        new AddImageUrlsToRestroomTask(imgUrl, restroomID, onTaskCompleteCallback);
     }
 
     /**
@@ -168,7 +151,7 @@ public class PlunjrAPIClient extends HttpClient {
         }
 
         @Override
-        protected void onPostExecute(Void result) {
+        protected void onPostExecute(Void res) {
             if(mOnTaskCompleteCallback != null) {
                 try {
                     mOnTaskCompleteCallback.call();
@@ -252,11 +235,70 @@ public class PlunjrAPIClient extends HttpClient {
         }
 
         @Override
-        protected void onPostExecute(Void result) {
+        protected void onPostExecute(Void res) {
             mAdapter.notifyDataSetChanged();
             if(mOnTaskCompleteCallable != null) {
                 try {
                     mOnTaskCompleteCallable.call();
+                } catch (Exception e) {
+                    Log.e(LOG_TAG, e.getMessage(), e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Used for asynchronously patching an existing restroom with image URLS.
+     * If this fails, show a toast or something to let the user know their
+     * image upload failed but that should be the worst consequence.
+     */
+    private class AddImageUrlsToRestroomTask extends AsyncTask<Void, Void, Void> {
+
+        private String mURL;
+        private int mRestroomID;
+        private Callable mOnTaskCompleteCallback;
+
+        public AddImageUrlsToRestroomTask(String url, int restroomID) {
+            this(url, restroomID, null);
+        }
+
+        public AddImageUrlsToRestroomTask(String url, int restroomID, Callable onTaskCompleteCallback) {
+            mURL = url;
+            mRestroomID = restroomID;
+            mOnTaskCompleteCallback = onTaskCompleteCallback;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            JSONObject resObj = null;
+
+            // Transform parameters into a correctly formatted string
+            JSONObject req = new JSONObject();
+            try {
+                JSONArray urlsArr = new JSONArray();
+                urlsArr.put(mURL);
+                req.put("imagesUrl", urlsArr);
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+            }
+            String res = patchJSONToURL(req, String.format(mContext.getString(R.string.patch_photo_uri), mRestroomID));
+
+            // Convert response to JSON object
+            if(res != null) {
+                try {
+                    resObj = new JSONObject(res);
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, e.getMessage(), e);
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void res) {
+            if(mOnTaskCompleteCallback != null) {
+                try {
+                    mOnTaskCompleteCallback.call();
                 } catch (Exception e) {
                     Log.e(LOG_TAG, e.getMessage(), e);
                 }

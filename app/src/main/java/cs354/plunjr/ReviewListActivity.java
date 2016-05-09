@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
 
 public class ReviewListActivity extends AppCompatActivity implements OnMapReadyCallback, WriteReviewDialogFragment.WriteReviewDialogListener {
 
@@ -153,11 +154,22 @@ public class ReviewListActivity extends AppCompatActivity implements OnMapReadyC
         if (requestCode == SELECT_PHOTO) {
             if (resultCode == RESULT_OK) {
                 try {
-                    Uri imageUri = data.getData();
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                    Uri imgUri = data.getData();
+                    Bitmap img = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imgUri);
 
-                    bitmap = Bitmap.createScaledBitmap(bitmap, 500, 500, false);
-                    new UploadImageToImgurTask(this).execute(bitmap);
+                    img = Bitmap.createScaledBitmap(img, 500, 500, false);
+                    new ImgurAPIClient(this).uploadImage(img, new Function<String, Void>() {
+                        @Override
+                        public Void execute(String imgurUrl) {
+                            if(imgurUrl != null) {
+                                Toast.makeText(getApplicationContext(), "Upload Succeeded!", Toast.LENGTH_SHORT).show();
+                                mPlunjrClient.uploadImages(imgurUrl, restroomID);
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Upload Failed", Toast.LENGTH_SHORT).show();
+                            }
+                            return null;
+                        }
+                    });
                 } catch(IOException e) {
                     Toast.makeText(this, "Upload Failed", Toast.LENGTH_SHORT).show();
                     Log.e("IMGUR UPLOAD", e.getMessage(), e);
@@ -165,45 +177,6 @@ public class ReviewListActivity extends AppCompatActivity implements OnMapReadyC
             } else if (resultCode == RESULT_CANCELED) {
                 // Do nothing
             }
-        }
-    }
-
-    private class UploadImageToImgurTask extends AsyncTask<Bitmap, Void, String> {
-
-        private Context mContext;
-
-        public UploadImageToImgurTask(Context context) {
-            mContext = context;
-        }
-
-        @Override
-        protected String doInBackground(Bitmap... params) {
-            return new ImgurAPIClient(mContext).uploadImage(params[0]);
-        }
-
-        @Override
-        protected void onPostExecute(String res) {
-            if(res != null) {
-                Toast.makeText(mContext, "Upload Succeeded!", Toast.LENGTH_SHORT).show();
-                new AddImageUrlsToRestroomTask(mContext).execute(res);
-            } else {
-                Toast.makeText(mContext, "Upload Failed", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    private class AddImageUrlsToRestroomTask extends AsyncTask<String, Void, Void> {
-
-        private Context mContext;
-
-        public AddImageUrlsToRestroomTask(Context context) {
-            mContext = context;
-        }
-
-        @Override
-        protected Void doInBackground(String... params) {
-            new PlunjrAPIClient(mContext).addImages(params[0], restroomID);
-            return null;
         }
     }
 }
