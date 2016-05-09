@@ -1,5 +1,6 @@
 package cs354.plunjr.Util;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.design.widget.AppBarLayout;
@@ -23,13 +24,10 @@ public class MapUtil {
 
     private static final double MAP_FRAGMENT_VH = 0.4;
     private static final int MAP_MARKER_SIZE_DP = 60;
-    private AppCompatActivity context;
 
-    public MapUtil(AppCompatActivity context) {
-        this.context = context;
-    }
+    private MapUtil() {}
 
-    public void setupMapFragment(AppBarLayout.OnOffsetChangedListener appBarListener) {
+    public static void setupMapFragment(AppCompatActivity context, AppBarLayout.OnOffsetChangedListener appBarListener) {
         // Begin map initialization
         SupportMapFragment mapFragment = (SupportMapFragment) context.getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -55,7 +53,7 @@ public class MapUtil {
         appBar.addOnOffsetChangedListener(appBarListener);
     }
 
-    public BitmapDescriptor getPinIcon() {
+    public static BitmapDescriptor getPinIcon(Context context) {
         // Scale plunger icon
         int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAP_MARKER_SIZE_DP, context.getResources().getDisplayMetrics());
         Bitmap icon = ((BitmapDrawable) ResourcesCompat.getDrawable(context.getResources(), R.drawable.plunger, null)).getBitmap();

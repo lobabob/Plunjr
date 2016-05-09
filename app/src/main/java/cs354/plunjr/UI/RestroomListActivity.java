@@ -46,7 +46,6 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private WriteReviewDialogFragment mDialog;
     private GoogleMap mMap;
-    private MapUtil mapUtil;
     private PlunjrAPIClient mPlunjrClient;
 
 
@@ -59,8 +58,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         final CollapsingToolbarLayout ctl = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbar);
 
-        this.mapUtil = new MapUtil(this);
-        mapUtil.setupMapFragment(new AppBarLayout.OnOffsetChangedListener() {
+        MapUtil.setupMapFragment(this, new AppBarLayout.OnOffsetChangedListener() {
             private int mStatusBarHeight;
 
             @Override
@@ -156,7 +154,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             mMap.clear();
 
-            BitmapDescriptor icon = mapUtil.getPinIcon();
+            BitmapDescriptor icon = MapUtil.getPinIcon(this);
 
             // Place map pins
             for(int i = 0; i < mRestroomListAdapter.getItemCount(); i++) {

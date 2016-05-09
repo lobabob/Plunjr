@@ -40,7 +40,6 @@ public class ReviewListActivity extends AppCompatActivity implements OnMapReadyC
 
     private ReviewListAdapter mReviewListAdapter;
     private GoogleMap mMap;
-    private MapUtil mapUtil;
     private int restroomID;
     private double lat;
     private double lng;
@@ -68,8 +67,7 @@ public class ReviewListActivity extends AppCompatActivity implements OnMapReadyC
         headerInfo.imgUrls = imgUrls;
         mReviewListAdapter = new ReviewListAdapter(this, lat, lng, headerInfo, new ArrayList<ReviewListAdapter.ReviewItem>());
 
-        this.mapUtil = new MapUtil(this);
-        mapUtil.setupMapFragment(new AppBarLayout.OnOffsetChangedListener() {
+        MapUtil.setupMapFragment(this, new AppBarLayout.OnOffsetChangedListener() {
             private int mStatusBarHeight;
 
             @Override
@@ -134,7 +132,7 @@ public class ReviewListActivity extends AppCompatActivity implements OnMapReadyC
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         mMap.clear();
 
-        BitmapDescriptor icon = mapUtil.getPinIcon();
+        BitmapDescriptor icon = MapUtil.getPinIcon(this);
 
         MarkerOptions marker = new MarkerOptions()
                 .position(pos)
