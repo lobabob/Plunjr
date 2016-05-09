@@ -11,6 +11,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 
 
@@ -31,16 +36,12 @@ public class PlunjrAPIClient extends HttpClient {
         new LoadRestroomsTask(adapter, onTaskCompleteCallback).execute();
     }
 
-    public JSONArray getReviews(int restroomID) {
-        String res = getFromURL(String.format(mContext.getString(R.string.get_reviews_uri), restroomID));
+    public void loadReviews(ReviewListAdapter adapter, int restroomID) {
+        new LoadReviewsTask(adapter, restroomID).execute();
+    }
 
-        JSONArray resArr = new JSONArray();
-        try {
-            resArr = new JSONArray(res);
-        } catch(JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-        }
-        return resArr;
+    public void loadReviews(ReviewListAdapter adapter, int restroomID, Callable onTaskCompleteCallback) {
+        new LoadReviewsTask(adapter, restroomID, onTaskCompleteCallback).execute();
     }
 
     public JSONObject postReview(String address, String user, String rating,
@@ -97,6 +98,11 @@ public class PlunjrAPIClient extends HttpClient {
         return resObj;
     }
 
+    /**
+     * Used for asynchronously populating a restroom list adapter with restroom info
+     * based on the user's current location. If this fails the adapter will have an
+     * empty list but that should be the worst outcome.
+     */
     private class LoadRestroomsTask extends AsyncTask<Void, Void, Void> {
 
         private static final double METERS_PER_MILE = 1609.344;
@@ -167,6 +173,91 @@ public class PlunjrAPIClient extends HttpClient {
                 try {
                     mOnTaskCompleteCallback.call();
                 } catch(Exception e) {
+                    Log.e(LOG_TAG, e.getMessage(), e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Used for asynchronously populating a review list adapter with review
+     * info using the restroom's ID. If this fails the adapter will have
+     * an empty list but that should be the worst that happens.
+     */
+    private class LoadReviewsTask extends AsyncTask<Void, Void, Void> {
+
+
+        private DateFormat parseDatePattern;
+        private DateFormat formatDatePattern;
+
+        private ReviewListAdapter mAdapter;
+        private Callable mOnTaskCompleteCallable;
+        private int mRestroomID;
+
+        public LoadReviewsTask(ReviewListAdapter adapter, int restroomID) {
+            this(adapter, restroomID, null);
+        }
+
+        public LoadReviewsTask(ReviewListAdapter adapter, int restroomID, Callable onTaskCompleteCallable) {
+            mAdapter = adapter;
+            mRestroomID = restroomID;
+            mOnTaskCompleteCallable = onTaskCompleteCallable;
+
+            parseDatePattern = new SimpleDateFormat(
+                    mContext.getResources().getString(R.string.review_parse_date), Locale.ROOT);
+            formatDatePattern = new SimpleDateFormat(
+                    mContext.getResources().getString(R.string.review_format_date), Locale.ROOT);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+//                JSONArray reviews = new JSONArray(getResources().getString(R.string.debug_review_json));
+                String res = getFromURL(String.format(mContext.getString(R.string.get_reviews_uri), mRestroomID));
+
+                JSONArray reviews = new JSONArray();
+                try {
+                    reviews = new JSONArray(res);
+                } catch(JSONException e) {
+                    Log.e(LOG_TAG, e.getMessage(), e);
+                }
+                mAdapter.clear();
+
+                // Create a hash map for each row's data (one hash map per row)
+                for(int i = 0; i < reviews.length(); i++) {
+                    JSONObject review = reviews.getJSONObject(i);
+                    ReviewListAdapter.ReviewInfo rowData = new ReviewListAdapter.ReviewInfo();
+
+                    rowData.user = review.optString("user");
+                    rowData.rating = (float) review.optDouble("rating");
+                    rowData.title = review.optString("title");
+                    rowData.description = review.optString("description");
+                    rowData.id = review.optInt("id");
+
+                    rowData.date = review.optString("date");
+
+                    try {
+                        Date date = parseDatePattern.parse(rowData.date);
+                        rowData.date = formatDatePattern.format(date);
+                    } catch (ParseException e) {
+                        Log.e("Date parsing/formatting", e.getMessage(), e);
+                        rowData.date = "Invalid Date";
+                    }
+                    mAdapter.add(rowData);
+                }
+            } catch(JSONException e) {
+                Log.e("Review List", e.getMessage(), e);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            mAdapter.notifyDataSetChanged();
+            if(mOnTaskCompleteCallable != null) {
+                try {
+                    mOnTaskCompleteCallable.call();
+                } catch (Exception e) {
                     Log.e(LOG_TAG, e.getMessage(), e);
                 }
             }

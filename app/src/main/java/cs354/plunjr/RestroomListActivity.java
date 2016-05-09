@@ -93,15 +93,14 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         sortOptionsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                sortRestroomList();
+                sortRestrooms();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
         mDialog = new WriteReviewDialogFragment();
-        mRestroomListAdapter = new RestroomListAdapter(new ArrayList<RestroomListAdapter.RestroomInfo>());
-        initRestroomList();
+        loadRestrooms();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -176,7 +175,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         }
     }
 
-    private void sortRestroomList() {
+    private void sortRestrooms() {
         String sortOption = ((Spinner) findViewById(R.id.sort_options_spinner)).getSelectedItem().toString();
         if(sortOption.equals(getString(R.string.sort_options_rating))) {
             mRestroomListAdapter.sortByRating();
@@ -185,28 +184,30 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         }
     }
 
-    private void initRestroomList() {
-        RecyclerView restroomListView = (RecyclerView) findViewById(R.id.restroomList);
-        restroomListView.setHasFixedSize(true);
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-        restroomListView.setLayoutManager(llm);
-        restroomListView.setAdapter(mRestroomListAdapter);
-        loadRestrooms();
-    }
-
     private void loadRestrooms() {
         if(mRestroomListAdapter != null) {
-            mPlunjrClient.loadRestrooms(mRestroomListAdapter, new LoadRestroomsCompleteCallable());
+            mPlunjrClient.loadRestrooms(mRestroomListAdapter, new RestroomsLoadedCallable());
+        } else {
+            mRestroomListAdapter = new RestroomListAdapter(new ArrayList<RestroomListAdapter.RestroomInfo>());
+            RecyclerView restroomListView = (RecyclerView) findViewById(R.id.restroomList);
+            restroomListView.setHasFixedSize(true);
+            LinearLayoutManager llm = new LinearLayoutManager(this);
+            llm.setOrientation(LinearLayoutManager.VERTICAL);
+            restroomListView.setLayoutManager(llm);
+            restroomListView.setAdapter(mRestroomListAdapter);
+            loadRestrooms();
         }
     }
 
-    private class LoadRestroomsCompleteCallable implements Callable<Void> {
+    /**
+     * Should be called whenever the restroom list is successfully populated
+     */
+    private class RestroomsLoadedCallable implements Callable<Void> {
 
         @Override
         public Void call() throws Exception {
             mSwipeRefreshLayout.setRefreshing(false);
-            sortRestroomList();
+            sortRestrooms();
             placeMapPins();
             return null;
         }
