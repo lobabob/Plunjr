@@ -1,11 +1,10 @@
-package cs354.plunjr;
+package cs354.plunjr.UI;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -16,6 +15,10 @@ import android.widget.LinearLayout;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.whinc.widget.ratingbar.RatingBar;
+
+import cs354.plunjr.Util.AddressUtil;
+import cs354.plunjr.HTTP.PlunjrAPIClient;
+import cs354.plunjr.R;
 
 
 public class WriteReviewDialogFragment extends DialogFragment {
@@ -119,19 +122,19 @@ public class WriteReviewDialogFragment extends DialogFragment {
                             lat = String.valueOf(latValue);
                             lng = String.valueOf(lngValue);
                         } else {
-                            LatLng rrLatLng = AddressUtils.getAddressLatLng(getActivity(), address);
+                            LatLng rrLatLng = AddressUtil.getAddressLatLng(getActivity(), address);
                             if(rrLatLng != null) {
                                 lat = String.valueOf(rrLatLng.latitude);
                                 lng = String.valueOf(rrLatLng.longitude);
                             }
                         }
 
-                        String name = AddressUtils.getAddressFeatureName(getActivity(), address);
+                        String name = AddressUtil.getAddressFeatureName(getActivity(), address);
                         name = name != null ? name : address;
 
                         // Post review if input is valid
                         if(validateInput(dialogView)) {
-                            new PlunjrAPIClient(d.getContext()).postReview(address, user, rating, title, review, name, lat, lng);
+                            new PlunjrAPIClient(d.getContext()).uploadReview(address, user, rating, title, review, name, lat, lng);
                             mWriteReviewDialogListener.onDialogPositiveClick();
                             d.dismiss();
                         }
@@ -145,7 +148,7 @@ public class WriteReviewDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 AddressAutoCompleteTextView addressView = (AddressAutoCompleteTextView) dialogView.findViewById(R.id.dialog_address);
-                addressView.setDropdownContents(AddressUtils.getUserAddresses(getActivity()));
+                addressView.setDropdownContents(AddressUtil.getUserAddresses(getActivity()));
                 addressView.showDropDown();
             }
         });
@@ -164,7 +167,7 @@ public class WriteReviewDialogFragment extends DialogFragment {
         View titleWarning   = v.findViewById(R.id.dialog_title_warning);
 
         // Validate address
-        if(latValue >= INVALID_LATLNG && !AddressUtils.isAddressValid(getActivity(), address.getText().toString())) {
+        if(latValue >= INVALID_LATLNG && !AddressUtil.isAddressValid(getActivity(), address.getText().toString())) {
             addressWarning.setVisibility(View.VISIBLE);
             valid = false;
         } else {

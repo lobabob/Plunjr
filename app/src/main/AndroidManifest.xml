@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
         <activity
-            android:name=".RestroomListActivity"
+            android:name=".UI.RestroomListActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -22,9 +22,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ReviewListActivity"
+            android:name=".UI.ReviewListActivity"
             android:label="@string/app_name"
-            android:parentActivityName=".RestroomListActivity"
+            android:parentActivityName=".UI.RestroomListActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data

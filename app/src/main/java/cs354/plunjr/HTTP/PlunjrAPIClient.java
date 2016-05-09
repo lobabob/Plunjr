@@ -1,4 +1,4 @@
-package cs354.plunjr;
+package cs354.plunjr.HTTP;
 
 import android.content.Context;
 import android.location.Location;
@@ -17,6 +17,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.Callable;
+
+import cs354.plunjr.Util.AddressUtil;
+import cs354.plunjr.R;
+import cs354.plunjr.UI.RestroomListAdapter;
+import cs354.plunjr.UI.ReviewListAdapter;
 
 
 public class PlunjrAPIClient extends HttpClient {
@@ -44,13 +49,13 @@ public class PlunjrAPIClient extends HttpClient {
         new LoadReviewsTask(adapter, restroomID, onTaskCompleteCallback).execute();
     }
 
-    public void postReview(String address, String user, String rating, String title,
-                           String description, String name, String lat, String lng) {
+    public void uploadReview(String address, String user, String rating, String title,
+                             String description, String name, String lat, String lng) {
         new PostReviewTask(address, user, rating, title, description, name, lat, lng).execute();
     }
 
-    public void postReview(String address, String user, String rating, String title,
-                           String description, String name, String lat, String lng, Callable onTaskCompleteCallback) {
+    public void uploadReview(String address, String user, String rating, String title,
+                             String description, String name, String lat, String lng, Callable onTaskCompleteCallback) {
         new PostReviewTask(address, user, rating, title, description, name, lat, lng, onTaskCompleteCallback).execute();
     }
 
@@ -86,7 +91,7 @@ public class PlunjrAPIClient extends HttpClient {
         protected Void doInBackground(Void... params) {
             try {
                 mAdapter.clear();
-                LatLng myPos = AddressUtils.getUserLatLng(mContext);
+                LatLng myPos = AddressUtil.getUserLatLng(mContext);
                 if(myPos != null) {
 //                    JSONArray restrooms = new JSONArray(getResources().getString(R.string.debug_restroom_json));
                     String restroomsString = getFromURL(String.format(mContext.getString(R.string.get_restrooms_uri), myPos.latitude, myPos.longitude));

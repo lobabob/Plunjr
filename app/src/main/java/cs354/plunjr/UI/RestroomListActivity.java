@@ -1,4 +1,4 @@
-package cs354.plunjr;
+package cs354.plunjr.UI;
 
 import android.graphics.Rect;
 import android.os.Build;
@@ -33,6 +33,11 @@ import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import cs354.plunjr.Util.AddressUtil;
+import cs354.plunjr.HTTP.PlunjrAPIClient;
+import cs354.plunjr.Util.MapUtil;
+import cs354.plunjr.R;
+
 public class RestroomListActivity extends AppCompatActivity implements OnMapReadyCallback, WriteReviewDialogFragment.WriteReviewDialogListener {
 
     private static AtomicInteger mAsyncTaskCounter = new AtomicInteger(2);
@@ -41,7 +46,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private WriteReviewDialogFragment mDialog;
     private GoogleMap mMap;
-    private MapUtility mapUtil;
+    private MapUtil mapUtil;
     private PlunjrAPIClient mPlunjrClient;
 
 
@@ -54,7 +59,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         final CollapsingToolbarLayout ctl = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbar);
 
-        this.mapUtil = new MapUtility(this);
+        this.mapUtil = new MapUtil(this);
         mapUtil.setupMapFragment(new AppBarLayout.OnOffsetChangedListener() {
             private int mStatusBarHeight;
 
@@ -120,7 +125,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
         // Center map on user's location before placing map pins
-        LatLng myPosition = AddressUtils.getUserLatLng(this);
+        LatLng myPosition = AddressUtil.getUserLatLng(this);
         if(myPosition != null && mMap != null) {
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 15.5f));
         }
@@ -163,7 +168,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
                 mMap.addMarker(marker);
                 builder.include(rrInfo.latLng);
             }
-            builder.include(AddressUtils.getUserLatLng(this));
+            builder.include(AddressUtil.getUserLatLng(this));
 
             try {
                 CameraUpdate update = CameraUpdateFactory.newLatLngBounds(builder.build(), 10);

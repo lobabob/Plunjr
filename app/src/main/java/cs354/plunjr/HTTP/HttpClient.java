@@ -1,4 +1,4 @@
-package cs354.plunjr;
+package cs354.plunjr.HTTP;
 
 import android.util.Log;
 

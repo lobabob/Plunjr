@@ -1,4 +1,4 @@
-package cs354.plunjr;
+package cs354.plunjr.Util;
 
 import android.content.Context;
 import android.location.Address;
@@ -15,9 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class AddressUtils {
+public class AddressUtil {
 
-    private AddressUtils() {}
+    private AddressUtil() {}
 
     public static List<Address> getUserAddresses(Context context) {
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());

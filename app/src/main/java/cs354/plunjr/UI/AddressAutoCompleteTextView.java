@@ -1,4 +1,4 @@
-package cs354.plunjr;
+package cs354.plunjr.UI;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -18,6 +18,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import cs354.plunjr.Util.AddressUtil;
+import cs354.plunjr.R;
 
 public class AddressAutoCompleteTextView extends AutoCompleteTextView {
 
@@ -80,7 +83,7 @@ public class AddressAutoCompleteTextView extends AutoCompleteTextView {
             } else {
                 tv = (TextView) mInflater.inflate(android.R.layout.simple_dropdown_item_1line, parent, false);
             }
-            tv.setText(AddressUtils.formatAsString(getItem(position)));
+            tv.setText(AddressUtil.formatAsString(getItem(position)));
             return tv;
         }
 
@@ -122,7 +125,7 @@ public class AddressAutoCompleteTextView extends AutoCompleteTextView {
 
                 @Override
                 public CharSequence convertResultToString(final Object resultValue) {
-                    return resultValue == null ? "" : AddressUtils.formatAsString((Address) resultValue);
+                    return resultValue == null ? "" : AddressUtil.formatAsString((Address) resultValue);
                 }
             };
         }

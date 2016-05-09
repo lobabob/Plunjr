@@ -1,4 +1,4 @@
-package cs354.plunjr;
+package cs354.plunjr.UI;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+
+import cs354.plunjr.R;
 
 public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapter.RestroomViewHolder> {
 
@@ -148,14 +150,14 @@ public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapte
     }
 
     public static class RestroomInfo {
-        protected String name;
-        protected String address;
-        protected double distance;
-        protected int reviewCount;
-        protected float rating;
-        protected LatLng latLng;
-        protected int id;
-        protected String[] imgUrls;
+        public String name;
+        public String address;
+        public double distance;
+        public int reviewCount;
+        public float rating;
+        public LatLng latLng;
+        public int id;
+        public String[] imgUrls;
     }
 
     /**
