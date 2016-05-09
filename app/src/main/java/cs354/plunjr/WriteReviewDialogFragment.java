@@ -109,6 +109,7 @@ public class WriteReviewDialogFragment extends DialogFragment {
                         String review  = ((EditText) dialogView.findViewById(R.id.dialog_review)).getText().toString();
                         String title   = ((EditText) dialogView.findViewById(R.id.dialog_title)).getText().toString();
                         String rating  = String.valueOf(((RatingBar) dialogView.findViewById(R.id.dialog_rating)).getCount());
+                        String user    = d.getContext().getString(R.string.default_user); // TODO: get actual user name when such a thing exists
 
                         String lat = "";
                         String lng = "";
@@ -130,7 +131,7 @@ public class WriteReviewDialogFragment extends DialogFragment {
 
                         // Post review if input is valid
                         if(validateInput(dialogView)) {
-                            new PostReviewTask().execute(address, rating, title, review, name, lat, lng);
+                            new PlunjrAPIClient(d.getContext()).postReview(address, user, rating, title, review, name, lat, lng);
                             mWriteReviewDialogListener.onDialogPositiveClick();
                             d.dismiss();
                         }
@@ -184,21 +185,5 @@ public class WriteReviewDialogFragment extends DialogFragment {
             titleWarning.setVisibility(View.GONE);
         }
         return valid;
-    }
-
-    private class PostReviewTask extends AsyncTask<String, Void, Void> {
-
-        @Override
-        protected Void doInBackground(String... params) {
-            String address = params[0];
-            String rating  = params[1];
-            String title   = params[2];
-            String review  = params[3];
-            String name    = params[4];
-            String lat     = params[5];
-            String lng     = params[6];
-            new PlunjrAPIClient(getActivity()).postReview(address, getString(R.string.default_user), rating, title, review, name, lat, lng);
-            return null;
-        }
     }
 }

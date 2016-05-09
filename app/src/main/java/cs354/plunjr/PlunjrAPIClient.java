@@ -44,33 +44,14 @@ public class PlunjrAPIClient extends HttpClient {
         new LoadReviewsTask(adapter, restroomID, onTaskCompleteCallback).execute();
     }
 
-    public JSONObject postReview(String address, String user, String rating,
-                                String title, String description, String name, String lat, String lng) {
-        JSONObject resObj = new JSONObject();
+    public void postReview(String address, String user, String rating, String title,
+                           String description, String name, String lat, String lng) {
+        new PostReviewTask(address, user, rating, title, description, name, lat, lng).execute();
+    }
 
-        // Transform parameters into a correctly formatted JSON string
-        JSONObject obj = new JSONObject();
-        try {
-            obj.put("address", address);
-            obj.put("user", user);
-            obj.put("rating", rating);
-            obj.put("title", title);
-            obj.put("description", description);
-            obj.put("name", name);
-            obj.put("lat", Double.parseDouble(lat));
-            obj.put("lng", Double.parseDouble(lng));
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-        }
-        String res = postJSONToURL(obj, mContext.getString(R.string.post_review_uri));
-
-        // Convert response to JSON array
-        try {
-            resObj = new JSONObject(res);
-        } catch(JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-        }
-        return resObj;
+    public void postReview(String address, String user, String rating, String title,
+                           String description, String name, String lat, String lng, Callable onTaskCompleteCallback) {
+        new PostReviewTask(address, user, rating, title, description, name, lat, lng, onTaskCompleteCallback).execute();
     }
 
     public void uploadImages(String imgUrl, int restroomID) {
@@ -187,9 +168,9 @@ public class PlunjrAPIClient extends HttpClient {
             mOnTaskCompleteCallable = onTaskCompleteCallable;
 
             parseDatePattern = new SimpleDateFormat(
-                    mContext.getResources().getString(R.string.review_parse_date), Locale.ROOT);
+                    mContext.getString(R.string.review_parse_date), Locale.ROOT);
             formatDatePattern = new SimpleDateFormat(
-                    mContext.getResources().getString(R.string.review_format_date), Locale.ROOT);
+                    mContext.getString(R.string.review_format_date), Locale.ROOT);
         }
 
         @Override
@@ -240,6 +221,83 @@ public class PlunjrAPIClient extends HttpClient {
             if(mOnTaskCompleteCallable != null) {
                 try {
                     mOnTaskCompleteCallable.call();
+                } catch (Exception e) {
+                    Log.e(LOG_TAG, e.getMessage(), e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Used for asynchronously posting a review object to be associated with
+     * a restroom (either old or new, we don't know!). If this fails, notify
+     * the user but that should be the extent of the consequence.
+     */
+    private class PostReviewTask extends AsyncTask<Void, Void, Void> {
+
+        private String mAddress;
+        private String mUser;
+        private String mRating;
+        private String mTitle;
+        private String mDescription;
+        private String mRRName;
+        private String mLat;
+        private String mLng;
+
+        private Callable mOnTaskCompleteCallback;
+
+        public PostReviewTask(String address, String user, String rating, String title,
+                              String description, String name, String lat, String lng) {
+            this(address, user, rating, title, description, name, lat, lng, null);
+        }
+
+        public PostReviewTask(String address, String user, String rating, String title,
+                              String description, String name, String lat, String lng, Callable onTaskCompleteCallback) {
+            mAddress = address;
+            mUser = user;
+            mRating = rating;
+            mTitle = title;
+            mDescription = description;
+            mRRName = name;
+            mLat = lat;
+            mLng = lng;
+            mOnTaskCompleteCallback = onTaskCompleteCallback;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            JSONObject resObj = new JSONObject();
+
+            // Transform parameters into a correctly formatted JSON string
+            JSONObject obj = new JSONObject();
+            try {
+                obj.put("address", mAddress);
+                obj.put("user", mUser);
+                obj.put("rating", mRating);
+                obj.put("title", mTitle);
+                obj.put("description", mDescription);
+                obj.put("name", mRRName);
+                obj.put("lat", Double.parseDouble(mLat));
+                obj.put("lng", Double.parseDouble(mLng));
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+            }
+            String res = postJSONToURL(obj, mContext.getString(R.string.post_review_uri));
+
+            // Convert response to JSON array
+            try {
+                resObj = new JSONObject(res);
+            } catch(JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void res) {
+            if(mOnTaskCompleteCallback != null) {
+                try {
+                    mOnTaskCompleteCallback.call();
                 } catch (Exception e) {
                     Log.e(LOG_TAG, e.getMessage(), e);
                 }
