@@ -55,31 +55,8 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         setContentView(R.layout.activity_restroom_list);
         mPlunjrClient = new PlunjrAPIClient(this);
 
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        final CollapsingToolbarLayout ctl = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbar);
+        MapUtil.setupMapFragment(this, true);
 
-        MapUtil.setupMapFragment(this, new AppBarLayout.OnOffsetChangedListener() {
-            private int mStatusBarHeight;
-
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                float curHeight = ctl.getHeight() + verticalOffset - mStatusBarHeight;
-                float scrimThreshold = 2 * ViewCompat.getMinimumHeight(ctl);
-
-                // Calculate status bar height if frame insets are supported (Kitkat+)
-                if(Build.VERSION.SDK_INT >= 19 && mStatusBarHeight <= 0) {
-                    Rect displayRect = new Rect();
-                    getWindow().getDecorView().getWindowVisibleDisplayFrame(displayRect);
-                    mStatusBarHeight = displayRect.top;
-                }
-                // Start fading from alpha=0 at the scrim threshold, reach alpha=1 at min height
-                if(curHeight < scrimThreshold) {
-                    toolbar.setAlpha(2 * (1 - curHeight / scrimThreshold));
-                } else {
-                    toolbar.setAlpha(0);
-                }
-            }
-        });
         // Refresh restroom list on swipe gesture
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.restroomListSwipeRefresh);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

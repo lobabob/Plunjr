@@ -67,19 +67,7 @@ public class ReviewListActivity extends AppCompatActivity implements OnMapReadyC
         headerInfo.imgUrls = imgUrls;
         mReviewListAdapter = new ReviewListAdapter(this, lat, lng, headerInfo, new ArrayList<ReviewListAdapter.ReviewItem>());
 
-        MapUtil.setupMapFragment(this, new AppBarLayout.OnOffsetChangedListener() {
-            private int mStatusBarHeight;
-
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                // Calculate status bar height if frame insets are supported (Kitkat+)
-                if(Build.VERSION.SDK_INT >= 19 && mStatusBarHeight <= 0) {
-                    Rect displayRect = new Rect();
-                    getWindow().getDecorView().getWindowVisibleDisplayFrame(displayRect);
-                    mStatusBarHeight = displayRect.top;
-                }
-            }
-        });
+        MapUtil.setupMapFragment(this, false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initReviewList();
     }
