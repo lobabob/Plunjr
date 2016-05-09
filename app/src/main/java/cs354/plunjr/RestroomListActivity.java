@@ -1,9 +1,6 @@
 package cs354.plunjr;
 
-import android.content.Context;
 import android.graphics.Rect;
-import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,7 +14,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -33,16 +29,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RestroomListActivity extends AppCompatActivity implements OnMapReadyCallback, WriteReviewDialogFragment.WriteReviewDialogListener {
 
-    private static final double METERS_PER_MILE = 1609.344;
     private static AtomicInteger mAsyncTaskCounter = new AtomicInteger(2);
 
     private RestroomListAdapter mRestroomListAdapter;
@@ -50,12 +42,14 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
     private WriteReviewDialogFragment mDialog;
     private GoogleMap mMap;
     private MapUtility mapUtil;
+    private PlunjrAPIClient mPlunjrClient;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restroom_list);
+        mPlunjrClient = new PlunjrAPIClient(this);
 
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         final CollapsingToolbarLayout ctl = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbar);
@@ -127,7 +121,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
         // Center map on user's location before placing map pins
-        LatLng myPosition = mapUtil.getUserLatLng();
+        LatLng myPosition = AddressUtils.getUserLatLng(this);
         if(myPosition != null && mMap != null) {
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 15.5f));
         }
@@ -170,8 +164,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
                 mMap.addMarker(marker);
                 builder.include(rrInfo.latLng);
             }
-
-            builder.include(mapUtil.getUserLatLng());
+            builder.include(AddressUtils.getUserLatLng(this));
 
             try {
                 CameraUpdate update = CameraUpdateFactory.newLatLngBounds(builder.build(), 10);
@@ -203,62 +196,19 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
     }
 
     private void loadRestrooms() {
-        new LoadRestroomsTask().execute(this);
+        if(mRestroomListAdapter != null) {
+            mPlunjrClient.loadRestrooms(mRestroomListAdapter, new LoadRestroomsCompleteCallable());
+        }
     }
 
-    /**
-     * Used by the RestroomListActivity to load the restroom list on a separate thread
-     */
-    private class LoadRestroomsTask extends AsyncTask<Context, Void, Void> {
+    private class LoadRestroomsCompleteCallable implements Callable<Void> {
 
         @Override
-        protected Void doInBackground(Context... params) {
-            try {
-                mRestroomListAdapter.clear();
-                LatLng myPos = mapUtil.getUserLatLng();
-                if(myPos != null) {
-//                    JSONArray restrooms = new JSONArray(getResources().getString(R.string.debug_restroom_json));
-                    JSONArray restrooms = new PlunjrAPIClient().getRestrooms(params[0], myPos.latitude, myPos.longitude);
-
-                    for (int i = 0; i < restrooms.length(); i++) {
-                        JSONObject restroom = restrooms.getJSONObject(i);
-                        RestroomListAdapter.RestroomInfo rrInfo = new RestroomListAdapter.RestroomInfo();
-
-                        // Calculate restroom distance from user
-                        LatLng rrPos = new LatLng(restroom.optDouble("lat"), restroom.optDouble("lng"));
-                        float res[] = {0};
-                        Location.distanceBetween(rrPos.latitude, rrPos.longitude, myPos.latitude, myPos.longitude, res);
-
-                        rrInfo.latLng = rrPos;
-                        rrInfo.distance = res[0] / METERS_PER_MILE;
-                        rrInfo.name = restroom.optString("name");
-                        rrInfo.address = restroom.optString("address");
-                        rrInfo.rating = (float) restroom.optDouble("averageRating");
-                        rrInfo.reviewCount = restroom.optInt("reviewCount");
-                        rrInfo.id = restroom.optInt("id");
-
-                        JSONArray imgUrlsJSON = restroom.optJSONArray("imagesUrl");
-                        if(imgUrlsJSON != null) {
-                            String[] imgUrls = new String[imgUrlsJSON.length()];
-                            for(int j = 0; j < imgUrlsJSON.length(); j++) {
-                                imgUrls[j] = imgUrlsJSON.get(j).toString();
-                            }
-                            rrInfo.imgUrls = imgUrls;
-                        }
-                        mRestroomListAdapter.add(rrInfo);
-                    }
-                }
-            } catch (JSONException e) {
-                Log.e("Restroom List", e.getMessage(), e);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
+        public Void call() throws Exception {
             mSwipeRefreshLayout.setRefreshing(false);
             sortRestroomList();
             placeMapPins();
+            return null;
         }
     }
 }

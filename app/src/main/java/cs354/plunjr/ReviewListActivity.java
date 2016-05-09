@@ -133,7 +133,7 @@ public class ReviewListActivity extends AppCompatActivity implements OnMapReadyC
         mMap.getUiSettings().setAllGesturesEnabled(false);
 
         // Center map on user's location before placing map pins
-        LatLng pos = mapUtil.getUserLatLng();
+        LatLng pos = AddressUtils.getUserLatLng(this);
         if(pos != null && mMap != null) {
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 15.5f));
         }
@@ -153,7 +153,7 @@ public class ReviewListActivity extends AppCompatActivity implements OnMapReadyC
                 .icon(icon);
         mMap.addMarker(marker);
         builder.include(pos);
-        builder.include(mapUtil.getUserLatLng());
+        builder.include(AddressUtils.getUserLatLng(this));
 
         try {
             CameraUpdate update = CameraUpdateFactory.newLatLngBounds(builder.build(), 100);
@@ -190,7 +190,7 @@ public class ReviewListActivity extends AppCompatActivity implements OnMapReadyC
         protected Void doInBackground(Integer... params) {
             try {
 //                JSONArray reviews = new JSONArray(getResources().getString(R.string.debug_review_json));
-                JSONArray reviews = new PlunjrAPIClient().getReviews(getApplicationContext(), params[0]);
+                JSONArray reviews = new PlunjrAPIClient(getApplicationContext()).getReviews(params[0]);
 
                 mReviewListAdapter.clear();
 
@@ -263,7 +263,7 @@ public class ReviewListActivity extends AppCompatActivity implements OnMapReadyC
 
         @Override
         protected Void doInBackground(String... params) {
-            new PlunjrAPIClient().addImages(mContext, params[0], restroomID);
+            new PlunjrAPIClient(mContext).addImages(params[0], restroomID);
             return null;
         }
     }

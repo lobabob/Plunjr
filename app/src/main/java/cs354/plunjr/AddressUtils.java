@@ -94,4 +94,18 @@ public class AddressUtils {
         }
         return valid;
     }
+
+    public static LatLng getUserLatLng(Context context) {
+        LatLng myPosition = null;
+
+        // Get user location
+        LocationManager locationManager = (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
+        String provider = locationManager.getBestProvider(new Criteria(), true);
+        Location location = locationManager.getLastKnownLocation(provider);
+
+        if(location != null) {
+            myPosition = new LatLng(location.getLatitude(), location.getLongitude());
+        }
+        return myPosition;
+    }
 }

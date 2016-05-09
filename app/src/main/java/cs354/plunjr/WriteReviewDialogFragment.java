@@ -197,7 +197,7 @@ public class WriteReviewDialogFragment extends DialogFragment {
             String name    = params[4];
             String lat     = params[5];
             String lng     = params[6];
-            new PlunjrAPIClient().postReview(getActivity(), address, getString(R.string.default_user), rating, title, review, name, lat, lng);
+            new PlunjrAPIClient(getActivity()).postReview(address, getString(R.string.default_user), rating, title, review, name, lat, lng);
             return null;
         }
     }
