@@ -1,19 +1,14 @@
 package cs354.plunjr.UI;
 
-import android.graphics.Rect;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -40,7 +35,7 @@ import cs354.plunjr.R;
 
 public class RestroomListActivity extends AppCompatActivity implements OnMapReadyCallback, WriteReviewDialogFragment.WriteReviewDialogListener {
 
-    private static AtomicInteger mAsyncTaskCounter = new AtomicInteger(2);
+    private static AtomicInteger mAsyncTaskCounter = new AtomicInteger(1);
 
     private RestroomListAdapter mRestroomListAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -166,6 +161,7 @@ public class RestroomListActivity extends AppCompatActivity implements OnMapRead
 
     private void loadRestrooms() {
         if(mRestroomListAdapter != null) {
+            mAsyncTaskCounter.getAndIncrement();
             mPlunjrClient.loadRestrooms(mRestroomListAdapter, new Callable() {
                 @Override
                 public Object call() throws Exception {
