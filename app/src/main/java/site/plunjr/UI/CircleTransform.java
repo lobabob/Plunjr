@@ -1,4 +1,4 @@
-package cs354.plunjr.UI;
+package site.plunjr.UI;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;

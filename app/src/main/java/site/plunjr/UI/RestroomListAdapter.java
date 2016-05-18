@@ -1,4 +1,4 @@
-package cs354.plunjr.UI;
+package site.plunjr.UI;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,7 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-import cs354.plunjr.R;
+import site.plunjr.R;
 
 public class RestroomListAdapter extends RecyclerView.Adapter<RestroomListAdapter.RestroomViewHolder> {
 

@@ -35,8 +35,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <cs354.plunjr.UI.AddressAutoCompleteTextView
-            xmlns:plunjr="http://schemas.android.com/apk/res/cs354.plunjr"
+        <site.plunjr.UI.AddressAutoCompleteTextView
+            xmlns:plunjr="http://schemas.android.com/apk/res/site.plunjr"
             android:id="@+id/dialog_address"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

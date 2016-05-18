@@ -1,4 +1,4 @@
-package cs354.plunjr.Util;
+package site.plunjr.Util;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -21,7 +21,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
-import cs354.plunjr.R;
+import site.plunjr.R;
 
 public class MapUtil {
 

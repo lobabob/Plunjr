@@ -1,4 +1,4 @@
-package cs354.plunjr.UI;
+package site.plunjr.UI;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -16,9 +16,9 @@ import android.widget.LinearLayout;
 import com.google.android.gms.maps.model.LatLng;
 import com.whinc.widget.ratingbar.RatingBar;
 
-import cs354.plunjr.Util.AddressUtil;
-import cs354.plunjr.HTTP.PlunjrAPIClient;
-import cs354.plunjr.R;
+import site.plunjr.Util.AddressUtil;
+import site.plunjr.HTTP.PlunjrAPIClient;
+import site.plunjr.R;
 
 
 public class WriteReviewDialogFragment extends DialogFragment {

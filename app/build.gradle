@@ -3,9 +3,8 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
-
     defaultConfig {
-        applicationId "cs354.plunjr"
+        applicationId 'site.plunjr'
         minSdkVersion 15
         targetSdkVersion 21
         versionCode 1
@@ -24,6 +23,8 @@ android {
             keyAlias "plunjrkey"
             keyPassword "123abc"
         }
+    }
+    productFlavors {
     }
 }
 

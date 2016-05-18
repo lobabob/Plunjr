@@ -1,4 +1,4 @@
-package cs354.plunjr.Util;
+package site.plunjr.Util;
 
 import android.content.Context;
 import android.location.Address;

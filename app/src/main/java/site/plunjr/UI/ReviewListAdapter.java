@@ -1,4 +1,4 @@
-package cs354.plunjr.UI;
+package site.plunjr.UI;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,7 +16,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import cs354.plunjr.R;
+import site.plunjr.R;
 
 public class ReviewListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
