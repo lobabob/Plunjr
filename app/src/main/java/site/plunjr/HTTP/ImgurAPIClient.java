@@ -1,4 +1,4 @@
-package cs354.plunjr.HTTP;
+package site.plunjr.HTTP;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -12,8 +12,8 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.net.HttpURLConnection;
 
-import cs354.plunjr.Util.Function;
-import cs354.plunjr.R;
+import site.plunjr.Util.Function;
+import site.plunjr.R;
 
 public class ImgurAPIClient extends HttpClient {
 

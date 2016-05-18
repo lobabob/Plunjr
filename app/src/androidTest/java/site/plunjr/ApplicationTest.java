@@ -1,4 +1,4 @@
-package cs354.plunjr;
+package site.plunjr;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

@@ -1,4 +1,4 @@
-package cs354.plunjr;
+package site.plunjr;
 
 import org.junit.Test;
 

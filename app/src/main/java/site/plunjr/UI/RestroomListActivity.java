@@ -1,4 +1,4 @@
-package cs354.plunjr.UI;
+package site.plunjr.UI;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -28,10 +28,10 @@ import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import cs354.plunjr.Util.AddressUtil;
-import cs354.plunjr.HTTP.PlunjrAPIClient;
-import cs354.plunjr.Util.MapUtil;
-import cs354.plunjr.R;
+import site.plunjr.Util.AddressUtil;
+import site.plunjr.HTTP.PlunjrAPIClient;
+import site.plunjr.Util.MapUtil;
+import site.plunjr.R;
 
 public class RestroomListActivity extends AppCompatActivity implements OnMapReadyCallback, WriteReviewDialogFragment.WriteReviewDialogListener {
 

@@ -1,4 +1,4 @@
-package cs354.plunjr.UI;
+package site.plunjr.UI;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import cs354.plunjr.Util.AddressUtil;
-import cs354.plunjr.R;
+import site.plunjr.Util.AddressUtil;
+import site.plunjr.R;
 
 public class AddressAutoCompleteTextView extends AutoCompleteTextView {
 

@@ -1,13 +1,10 @@
-package cs354.plunjr.UI;
+package site.plunjr.UI;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,12 +24,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import cs354.plunjr.Util.AddressUtil;
-import cs354.plunjr.Util.Function;
-import cs354.plunjr.HTTP.ImgurAPIClient;
-import cs354.plunjr.HTTP.PlunjrAPIClient;
-import cs354.plunjr.Util.MapUtil;
-import cs354.plunjr.R;
+import site.plunjr.Util.AddressUtil;
+import site.plunjr.Util.Function;
+import site.plunjr.HTTP.ImgurAPIClient;
+import site.plunjr.HTTP.PlunjrAPIClient;
+import site.plunjr.Util.MapUtil;
+import site.plunjr.R;
 
 public class ReviewListActivity extends AppCompatActivity implements OnMapReadyCallback, WriteReviewDialogFragment.WriteReviewDialogListener {
 

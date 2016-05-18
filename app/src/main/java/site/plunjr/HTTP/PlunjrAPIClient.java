@@ -1,4 +1,4 @@
-package cs354.plunjr.HTTP;
+package site.plunjr.HTTP;
 
 import android.content.Context;
 import android.location.Location;
@@ -18,10 +18,10 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.Callable;
 
-import cs354.plunjr.Util.AddressUtil;
-import cs354.plunjr.R;
-import cs354.plunjr.UI.RestroomListAdapter;
-import cs354.plunjr.UI.ReviewListAdapter;
+import site.plunjr.Util.AddressUtil;
+import site.plunjr.R;
+import site.plunjr.UI.RestroomListAdapter;
+import site.plunjr.UI.ReviewListAdapter;
 
 
 public class PlunjrAPIClient extends HttpClient {
